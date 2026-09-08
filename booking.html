@@ -1,1 +1,647 @@
 Booking Page
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oceanic Airways — Book a flight</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,ital@9..144,300,1;9..144,600,0;9..144,600,1&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+  :root{
+    --ink:        #0D2436;
+    --marine:     #163A52;
+    --marine-2:   #1E4A66;
+    --foam:       #EDEFEA;
+    --card:       #FBFAF7;
+    --brass:      #C0873E;
+    --brass-dark: #9C6C2B;
+    --text:       #12222B;
+    --muted:      #5E7481;
+    --line:       #D8DCD3;
+    --radius:     4px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0;
+    background: var(--foam);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, .brand-word{ font-family:'Fraunces', Georgia, serif; }
+  .wrap{
+    max-width: 1120px;
+    margin: 0 auto;
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+  a{ color:inherit; }
+  button{ font-family: inherit; cursor:pointer; }
+  input, select{ font-family: inherit; }
+
+  /* ---------- header ---------- */
+  .site-header{
+    background: var(--ink);
+    color: #F4F4F0;
+  }
+  .site-header .wrap{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    height: 68px;
+  }
+  .wordmark{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+    color:#F4F4F0;
+  }
+  .wordmark svg{ width:22px; height:22px; flex-shrink:0; }
+  .brand-word{
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .site-nav{
+    display:flex;
+    gap: 28px;
+    font-size: 14px;
+  }
+  .site-nav a{
+    text-decoration:none;
+    color: #C9D2D6;
+    padding-bottom: 3px;
+    border-bottom: 1px solid transparent;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .site-nav a:hover{ color:#F4F4F0; border-color: var(--brass); }
+  .site-nav a.current{ color:#F4F4F0; border-color: var(--brass); }
+  @media (max-width: 640px){
+    .site-nav{ display:none; }
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    background: linear-gradient(180deg, var(--ink) 0%, var(--marine) 100%);
+    color: #F4F4F0;
+    overflow:hidden;
+    padding-top: 64px;
+    padding-bottom: 150px;
+  }
+  .chart-lines{
+    position:absolute;
+    inset:0;
+    opacity: 0.5;
+    pointer-events:none;
+  }
+  .chart-lines svg{ width:100%; height:100%; }
+  .hero-inner{
+    position:relative;
+    max-width: 560px;
+  }
+  .hero-inner h1{
+    font-size: clamp(34px, 5vw, 50px);
+    font-weight: 600;
+    line-height: 1.12;
+    margin: 0 0 18px;
+    letter-spacing: -0.01em;
+  }
+  .hero-inner p{
+    font-size: 16px;
+    line-height: 1.6;
+    color: #C9D2D6;
+    margin: 0;
+    max-width: 46ch;
+  }
+
+  /* ---------- booking card ---------- */
+  .booking-wrap{
+    position:relative;
+    margin-top: -108px;
+    padding-bottom: 64px;
+  }
+  .ticket-card{
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 48px -20px rgba(13,36,54,0.45);
+    overflow:hidden;
+  }
+  .ticket-tabs{
+    display:flex;
+    background: var(--ink);
+  }
+  .tab{
+    appearance:none;
+    border:none;
+    background:transparent;
+    color:#93A5AE;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 16px 24px;
+    border-bottom: 2px solid transparent;
+    transition: color .15s ease, border-color .15s ease;
+  }
+  .tab.active{
+    color:#F4F4F0;
+    border-bottom-color: var(--brass);
+  }
+
+  .ticket-body{ padding: 32px 32px 28px; }
+
+  .field label{
+    display:block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight:500;
+  }
+  .field input, .field select{
+    width:100%;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 11px 12px;
+    font-size: 15px;
+    color: var(--text);
+    background:#fff;
+  }
+  .field input:focus, .field select:focus, button:focus-visible{
+    outline: 2px solid var(--brass);
+    outline-offset: 1px;
+  }
+
+  .route-row{
+    display:grid;
+    grid-template-columns: 1fr 44px 1fr;
+    align-items:end;
+    gap: 12px;
+  }
+  .swap-btn{
+    width:40px; height:40px;
+    border-radius:50%;
+    border: 1px solid var(--line);
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom: 2px;
+    transition: transform .3s ease, border-color .15s ease;
+  }
+  .swap-btn:hover{ border-color: var(--brass); }
+  .swap-btn.spun{ transform: rotate(180deg); }
+  .swap-btn svg{ width:18px; height:18px; stroke: var(--marine-2); }
+
+  .perforation{
+    position:relative;
+    height: 1px;
+    margin: 26px -32px 22px;
+    background-image: radial-gradient(circle, var(--line) 1.5px, transparent 1.5px);
+    background-size: 10px 1px;
+    background-repeat: repeat-x;
+    background-position: center;
+  }
+  .perforation::before, .perforation::after{
+    content:"";
+    position:absolute;
+    top:-11px;
+    width:22px; height:22px;
+    border-radius:50%;
+    background: var(--foam);
+  }
+  .perforation::before{ left:-11px; }
+  .perforation::after{ right:-11px; }
+
+  .dates-row{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 22px;
+  }
+  .return-field.hidden{ visibility:hidden; }
+
+  .pax-row{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:16px;
+    margin-bottom: 26px;
+  }
+  .stepper{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 6px 8px;
+    background:#fff;
+  }
+  .stepper button{
+    width:28px; height:28px;
+    border-radius:50%;
+    border: 1px solid var(--line);
+    background:#fff;
+    color: var(--marine-2);
+    font-size:16px;
+    line-height:1;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .stepper button:hover{ border-color: var(--brass); }
+  .stepper span{ font-size:15px; }
+
+  .search-btn{
+    width:100%;
+    border:none;
+    border-radius: var(--radius);
+    background: var(--brass);
+    color: var(--ink);
+    font-size: 15px;
+    font-weight:600;
+    padding: 14px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    transition: background .15s ease;
+  }
+  .search-btn:hover{ background: var(--brass-dark); color:#F4F4F0; }
+  .search-btn svg{ width:16px; height:16px; }
+
+  .search-feedback{
+    margin:0;
+    padding: 14px 32px;
+    font-size: 13.5px;
+    color: var(--marine-2);
+    background: #F3F0E6;
+    border-top: 1px solid var(--line);
+    min-height: 0;
+    max-height: 0;
+    overflow:hidden;
+    opacity:0;
+    transition: max-height .25s ease, opacity .2s ease, padding .25s ease;
+  }
+  .search-feedback.show{
+    max-height: 60px;
+    opacity:1;
+  }
+
+  @media (max-width: 640px){
+    .ticket-body{ padding: 24px 20px; }
+    .perforation{ margin: 22px -20px 20px; }
+    .route-row{ grid-template-columns: 1fr; }
+    .swap-btn{ justify-self:start; margin: 4px 0; }
+    .dates-row, .pax-row{ grid-template-columns: 1fr; }
+  }
+
+  /* ---------- popular routes ---------- */
+  .routes{ padding: 8px 0 56px; }
+  .routes h2{
+    font-size: 24px;
+    font-weight:600;
+    margin: 0 0 20px;
+  }
+  .route-cards{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .route-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    display:flex;
+    flex-direction:column;
+    gap: 14px;
+  }
+  .route-card .arc{ width:100%; height:56px; }
+  .route-card .arc path{ fill:none; stroke: var(--marine-2); stroke-width:1.5; }
+  .route-card .arc circle{ fill: var(--brass); }
+  .route-names{
+    display:flex;
+    justify-content:space-between;
+    font-size: 14px;
+    font-weight:600;
+    color: var(--text);
+  }
+  .route-meta{
+    display:flex;
+    justify-content:space-between;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .route-price{ font-size: 13px; color: var(--muted); }
+  .route-price strong{ color: var(--text); font-size: 16px; }
+  .route-select{
+    align-self:flex-start;
+    background:none;
+    border:none;
+    padding:0;
+    font-size: 13px;
+    font-weight:600;
+    color: var(--brass-dark);
+    border-bottom: 1px solid var(--brass-dark);
+  }
+  @media (max-width: 860px){
+    .route-cards{ grid-template-columns: 1fr; }
+  }
+
+  /* ---------- info strip ---------- */
+  .info-strip{
+    border-top: 1px solid var(--line);
+    padding: 40px 0 48px;
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+  .info-item{ display:flex; gap:14px; }
+  .info-item svg{ width:26px; height:26px; flex-shrink:0; stroke: var(--marine-2); margin-top:2px; }
+  .info-item h3{
+    margin: 0 0 4px;
+    font-size: 14.5px;
+    font-weight:600;
+  }
+  .info-item p{
+    margin:0;
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height:1.5;
+  }
+  @media (max-width: 760px){
+    .info-strip{ grid-template-columns: 1fr; }
+  }
+
+  /* ---------- footer ---------- */
+  .site-footer{
+    background: var(--ink);
+    color: #8FA0AA;
+    font-size: 12.5px;
+    padding: 22px 0;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; animation:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="wordmark" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#F4F4F0" stroke-width="1.6"><path d="M2 16l6-2 4-8 2 .6-2.4 7.4 5-1.3.6 1.9L11 17l-1.5 4-1.7-.5.7-4.3-4.8 1.3z"/></svg>
+      <span class="brand-word">Oceanic</span>
+    </a>
+    <nav class="site-nav">
+      <a href="#" class="current">Book</a>
+      <a href="#">Manage trip</a>
+      <a href="#">Check in</a>
+      <a href="#">Help</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="chart-lines" aria-hidden="true">
+    <svg viewBox="0 0 1120 460" preserveAspectRatio="xMidYMid slice">
+      <g fill="none" stroke="#3E6A82" stroke-width="1">
+        <path d="M-40 380 Q 300 300 640 360 T 1180 320"/>
+        <path d="M-40 420 Q 320 350 660 410 T 1180 370"/>
+        <path d="M-40 340 Q 280 260 620 310 T 1180 270"/>
+      </g>
+      <g id="flightArc" fill="none" stroke="#C0873E" stroke-width="1.6" stroke-dasharray="900" stroke-dashoffset="900">
+        <path d="M120 90 Q 520 -40 940 130"/>
+      </g>
+      <circle cx="120" cy="90" r="4" fill="#F4F4F0"/>
+      <circle cx="940" cy="130" r="4" fill="#F4F4F0"/>
+    </svg>
+  </div>
+  <div class="wrap hero-inner">
+    <h1>Every horizon has a gate number.</h1>
+    <p>Search Oceanic's network across the Pacific and Indian Ocean, and hold your seat in minutes.</p>
+  </div>
+</section>
+
+<div class="wrap booking-wrap">
+  <form class="ticket-card" id="bookingForm">
+    <div class="ticket-tabs">
+      <button type="button" class="tab active" data-trip="round">Round trip</button>
+      <button type="button" class="tab" data-trip="oneway">One way</button>
+    </div>
+
+    <div class="ticket-body">
+      <div class="route-row">
+        <div class="field">
+          <label for="fromInput">From</label>
+          <input id="fromInput" list="airportList" value="Brisbane (BNE)">
+        </div>
+        <button type="button" class="swap-btn" id="swapBtn" aria-label="Swap origin and destination">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>
+        </button>
+        <div class="field">
+          <label for="toInput">To</label>
+          <input id="toInput" list="airportList" value="Tokyo Narita (NRT)">
+        </div>
+      </div>
+
+      <datalist id="airportList">
+        <option value="Brisbane (BNE)">
+        <option value="Sydney (SYD)">
+        <option value="Melbourne (MEL)">
+        <option value="Auckland (AKL)">
+        <option value="Tokyo Narita (NRT)">
+        <option value="Singapore (SIN)">
+        <option value="Los Angeles (LAX)">
+        <option value="Nadi (NAN)">
+        <option value="Honolulu (HNL)">
+      </datalist>
+
+      <div class="perforation" aria-hidden="true"></div>
+
+      <div class="dates-row">
+        <div class="field">
+          <label for="departDate">Depart</label>
+          <input type="date" id="departDate">
+        </div>
+        <div class="field return-field" id="returnField">
+          <label for="returnDate">Return</label>
+          <input type="date" id="returnDate">
+        </div>
+      </div>
+
+      <div class="pax-row">
+        <div class="field">
+          <label id="paxLabel">Passengers</label>
+          <div class="stepper" role="group" aria-labelledby="paxLabel">
+            <button type="button" id="paxMinus" aria-label="Fewer passengers">–</button>
+            <span id="paxCount">1 adult</span>
+            <button type="button" id="paxPlus" aria-label="More passengers">+</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="cabinSelect">Cabin</label>
+          <select id="cabinSelect">
+            <option>Economy</option>
+            <option>Premium Economy</option>
+            <option>Business</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="search-btn">
+        Search flights
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <p class="search-feedback" id="searchFeedback" role="status"></p>
+  </form>
+</div>
+
+<section class="routes wrap">
+  <h2>Popular this month</h2>
+  <div class="route-cards">
+
+    <article class="route-card">
+      <svg class="arc" viewBox="0 0 260 56"><path d="M10 46 Q130 -10 250 46"/><circle cx="10" cy="46" r="3"/><circle cx="250" cy="46" r="3"/></svg>
+      <div class="route-names"><span>Brisbane</span><span>Tokyo Narita</span></div>
+      <div class="route-meta"><span>9h 40m direct</span><span>BNE–NRT</span></div>
+      <div class="route-price">from <strong>$780</strong> return</div>
+      <button type="button" class="route-select" data-from="Brisbane (BNE)" data-to="Tokyo Narita (NRT)">Use this route</button>
+    </article>
+
+    <article class="route-card">
+      <svg class="arc" viewBox="0 0 260 56"><path d="M10 46 Q130 -10 250 46"/><circle cx="10" cy="46" r="3"/><circle cx="250" cy="46" r="3"/></svg>
+      <div class="route-names"><span>Sydney</span><span>Los Angeles</span></div>
+      <div class="route-meta"><span>13h 55m direct</span><span>SYD–LAX</span></div>
+      <div class="route-price">from <strong>$1,120</strong> return</div>
+      <button type="button" class="route-select" data-from="Sydney (SYD)" data-to="Los Angeles (LAX)">Use this route</button>
+    </article>
+
+    <article class="route-card">
+      <svg class="arc" viewBox="0 0 260 56"><path d="M10 46 Q130 -10 250 46"/><circle cx="10" cy="46" r="3"/><circle cx="250" cy="46" r="3"/></svg>
+      <div class="route-names"><span>Melbourne</span><span>Singapore</span></div>
+      <div class="route-meta"><span>8h 05m direct</span><span>MEL–SIN</span></div>
+      <div class="route-price">from <strong>$640</strong> return</div>
+      <button type="button" class="route-select" data-from="Melbourne (MEL)" data-to="Singapore (SIN)">Use this route</button>
+    </article>
+
+  </div>
+</section>
+
+<section class="info-strip wrap">
+  <div class="info-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16v11a1 1 0 01-1 1H5a1 1 0 01-1-1V8zM9 8V6a3 3 0 016 0v2"/></svg>
+    <div>
+      <h3>Checked bag included</h3>
+      <p>One 23kg bag comes standard on every Economy fare across the network.</p>
+    </div>
+  </div>
+  <div class="info-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18M7 3v4M17 3v4M5 6h14a2 2 0 012 2v11a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z"/></svg>
+    <div>
+      <h3>Free date changes</h3>
+      <p>Move your flight up to 24 hours before departure, no change fee.</p>
+    </div>
+  </div>
+  <div class="info-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg>
+    <div>
+      <h3>Three fare families</h3>
+      <p>Value, Flex, and Premium — compare what's included before you book.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">Oceanic Airways is a fictional carrier — this page is a design sample.</div>
+</footer>
+
+<script>
+  // Trip type tabs
+  const tabs = document.querySelectorAll('.tab');
+  const returnField = document.getElementById('returnField');
+  const returnDate = document.getElementById('returnDate');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      if (tab.dataset.trip === 'oneway') {
+        returnField.classList.add('hidden');
+        returnDate.required = false;
+      } else {
+        returnField.classList.remove('hidden');
+      }
+    });
+  });
+
+  // Swap origin / destination
+  const fromInput = document.getElementById('fromInput');
+  const toInput = document.getElementById('toInput');
+  const swapBtn = document.getElementById('swapBtn');
+  swapBtn.addEventListener('click', () => {
+    const temp = fromInput.value;
+    fromInput.value = toInput.value;
+    toInput.value = temp;
+    swapBtn.classList.add('spun');
+    setTimeout(() => swapBtn.classList.remove('spun'), 300);
+  });
+
+  // Passenger stepper
+  let paxCount = 1;
+  const paxCountEl = document.getElementById('paxCount');
+  document.getElementById('paxPlus').addEventListener('click', () => {
+    if (paxCount < 9) paxCount++;
+    updatePax();
+  });
+  document.getElementById('paxMinus').addEventListener('click', () => {
+    if (paxCount > 1) paxCount--;
+    updatePax();
+  });
+  function updatePax(){
+    paxCountEl.textContent = paxCount + (paxCount === 1 ? ' adult' : ' adults');
+  }
+
+  // Popular route quick-select
+  document.querySelectorAll('.route-select').forEach(btn => {
+    btn.addEventListener('click', () => {
+      fromInput.value = btn.dataset.from;
+      toInput.value = btn.dataset.to;
+      document.getElementById('bookingForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Submit feedback (no backend — demo only)
+  const form = document.getElementById('bookingForm');
+  const feedback = document.getElementById('searchFeedback');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const trip = paxCountEl.textContent;
+    feedback.textContent = `Searching ${fromInput.value} to ${toInput.value} for ${trip}, ${document.getElementById('cabinSelect').value} — this is a design sample, no live inventory is connected.`;
+    feedback.classList.add('show');
+  });
+
+  // Draw the hero flight arc once on load
+  window.addEventListener('DOMContentLoaded', () => {
+    const arc = document.getElementById('flightArc');
+    requestAnimationFrame(() => {
+      arc.style.transition = 'stroke-dashoffset 1.4s ease';
+      arc.style.strokeDashoffset = '0';
+    });
+  });
+
+  // Default dates: depart in 14 days, return in 21
+  const fmt = d => d.toISOString().split('T')[0];
+  const today = new Date();
+  const depart = new Date(today); depart.setDate(depart.getDate() + 14);
+  const ret = new Date(today); ret.setDate(ret.getDate() + 21);
+  document.getElementById('departDate').value = fmt(depart);
+  document.getElementById('departDate').min = fmt(today);
+  returnDate.value = fmt(ret);
+  returnDate.min = fmt(depart);
+</script>
+
+</body>
+</html>
