@@ -1,1 +1,462 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oceanic Airways — Help</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,ital@9..144,300,1;9..144,600,0;9..144,600,1&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+  :root{
+    --ink:        #0D2436;
+    --marine:     #163A52;
+    --marine-2:   #1E4A66;
+    --foam:       #EDEFEA;
+    --card:       #FBFAF7;
+    --brass:      #C0873E;
+    --brass-dark: #9C6C2B;
+    --text:       #12222B;
+    --muted:      #5E7481;
+    --line:       #D8DCD3;
+    --radius:     4px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0;
+    background: var(--foam);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, .brand-word{ font-family:'Fraunces', Georgia, serif; }
+  .wrap{ max-width: 1120px; margin: 0 auto; padding-left: 28px; padding-right: 28px; }
+  a{ color:inherit; }
+  button{ font-family: inherit; cursor:pointer; }
+  input{ font-family: inherit; }
+
+  /* ---------- header ---------- */
+  .site-header{ background: var(--ink); color:#F4F4F0; }
+  .site-header .wrap{ display:flex; align-items:center; justify-content:space-between; height:68px; }
+  .wordmark{ display:flex; align-items:center; gap:10px; text-decoration:none; color:#F4F4F0; }
+  .wordmark svg{ width:22px; height:22px; }
+  .brand-word{ font-size:20px; font-weight:600; letter-spacing:0.02em; }
+  .site-nav{ display:flex; gap:28px; font-size:14px; }
+  .site-nav a{ text-decoration:none; color:#C9D2D6; padding-bottom:3px; border-bottom:1px solid transparent; transition: color .15s ease, border-color .15s ease; }
+  .site-nav a:hover{ color:#F4F4F0; border-color: var(--brass); }
+  .site-nav a.current{ color:#F4F4F0; border-color: var(--brass); }
+  @media (max-width:640px){ .site-nav{ display:none; } }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    background: linear-gradient(180deg, var(--ink) 0%, var(--marine) 100%);
+    color:#F4F4F0;
+    overflow:hidden;
+    padding: 64px 0 96px;
+    text-align:center;
+  }
+  .chart-lines{ position:absolute; inset:0; opacity:.45; pointer-events:none; }
+  .chart-lines svg{ width:100%; height:100%; }
+  .hero-inner{ position:relative; max-width: 640px; margin: 0 auto; }
+  .hero-inner h1{
+    font-size: clamp(30px, 4.5vw, 44px);
+    font-weight:600;
+    line-height:1.15;
+    margin: 0 0 14px;
+  }
+  .hero-inner p{
+    font-size:15.5px;
+    color:#C9D2D6;
+    margin: 0 0 28px;
+  }
+  .help-search{
+    position:relative;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .help-search input{
+    width:100%;
+    border:none;
+    border-radius: var(--radius);
+    padding: 15px 46px 15px 16px;
+    font-size:15px;
+    color: var(--text);
+  }
+  .help-search input:focus{ outline: 2px solid var(--brass); }
+  .help-search svg{
+    position:absolute;
+    right:16px; top:50%;
+    transform:translateY(-50%);
+    width:18px; height:18px;
+    stroke: var(--muted);
+    pointer-events:none;
+  }
+
+  /* ---------- category grid ---------- */
+  .categories{ margin-top: -56px; position:relative; padding-bottom: 48px; }
+  .category-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .category-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px;
+    text-align:left;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    box-shadow: 0 18px 36px -22px rgba(13,36,54,0.35);
+    transition: border-color .15s ease;
+  }
+  .category-card:hover{ border-color: var(--brass); }
+  .category-card svg{ width:24px; height:24px; stroke: var(--marine-2); }
+  .category-card h3{ margin:0; font-size: 15px; font-weight:600; }
+  .category-card p{ margin:0; font-size: 13px; color: var(--muted); line-height:1.5; }
+  @media (max-width: 860px){
+    .category-grid{ grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 560px){
+    .category-grid{ grid-template-columns: 1fr; }
+  }
+
+  /* ---------- FAQ ---------- */
+  .faq{ padding: 8px 0 56px; }
+  .faq h2{ font-size: 24px; font-weight:600; margin: 0 0 6px; }
+  .faq .subtitle{ font-size: 13.5px; color: var(--muted); margin: 0 0 24px; }
+  .faq-item{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow:hidden;
+  }
+  .faq-question{
+    width:100%;
+    background:none;
+    border:none;
+    padding: 16px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap: 16px;
+    font-size: 14.5px;
+    font-weight:600;
+    text-align:left;
+    color: var(--text);
+  }
+  .faq-question svg{
+    width:16px; height:16px;
+    stroke: var(--marine-2);
+    flex-shrink:0;
+    transition: transform .2s ease;
+  }
+  .faq-item.open .faq-question svg{ transform: rotate(180deg); }
+  .faq-answer{
+    max-height: 0;
+    overflow:hidden;
+    transition: max-height .25s ease;
+  }
+  .faq-answer p{
+    margin:0;
+    padding: 0 20px 18px;
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 68ch;
+  }
+  .faq-item.hidden{ display:none; }
+  .no-results{
+    display:none;
+    font-size: 13.5px;
+    color: var(--muted);
+    padding: 20px 0;
+  }
+  .no-results.show{ display:block; }
+
+  /* ---------- contact ---------- */
+  .contact{ padding: 8px 0 56px; }
+  .contact h2{ font-size: 22px; font-weight:600; margin: 0 0 20px; }
+  .contact-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .contact-card{
+    background: var(--ink);
+    color:#F4F4F0;
+    border-radius: var(--radius);
+    padding: 22px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .contact-card svg{ width:22px; height:22px; stroke: var(--brass); }
+  .contact-card h3{ margin:0; font-size:15px; font-weight:600; }
+  .contact-card p{ margin:0; font-size:13px; color:#B9CAD1; line-height:1.5; }
+  .contact-card .action{
+    margin-top: 8px;
+    align-self:flex-start;
+    background: var(--brass);
+    color: var(--ink);
+    border:none;
+    border-radius: var(--radius);
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight:600;
+  }
+  .contact-card .action:hover{ background: var(--brass-dark); color:#F4F4F0; }
+  @media (max-width: 860px){
+    .contact-grid{ grid-template-columns: 1fr; }
+  }
+
+  .site-footer{ background: var(--ink); color:#8FA0AA; font-size:12.5px; padding:22px 0; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="wordmark" href="oceanic-booking.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#F4F4F0" stroke-width="1.6"><path d="M2 16l6-2 4-8 2 .6-2.4 7.4 5-1.3.6 1.9L11 17l-1.5 4-1.7-.5.7-4.3-4.8 1.3z"/></svg>
+      <span class="brand-word">Oceanic</span>
+    </a>
+    <nav class="site-nav">
+      <a href="oceanic-booking.html">Book</a>
+      <a href="#">Manage trip</a>
+      <a href="#">Check in</a>
+      <a href="#" class="current">Help</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="chart-lines" aria-hidden="true">
+    <svg viewBox="0 0 1120 300" preserveAspectRatio="xMidYMid slice">
+      <g fill="none" stroke="#3E6A82" stroke-width="1">
+        <path d="M-40 240 Q 300 180 640 220 T 1180 190"/>
+        <path d="M-40 270 Q 320 220 660 260 T 1180 230"/>
+      </g>
+    </svg>
+  </div>
+  <div class="wrap hero-inner">
+    <h1>How can we help?</h1>
+    <p>Search our help centre, or browse the topics below.</p>
+    <div class="help-search">
+      <input type="text" id="faqSearch" placeholder="Search for a topic, e.g. “change my flight”">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    </div>
+  </div>
+</section>
+
+<section class="categories wrap">
+  <div class="category-grid">
+    <button type="button" class="category-card" data-filter="booking">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+      <h3>Booking &amp; payments</h3>
+      <p>Fares, payment methods, booking confirmations.</p>
+    </button>
+    <button type="button" class="category-card" data-filter="baggage">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16v11a1 1 0 01-1 1H5a1 1 0 01-1-1V8zM9 8V6a3 3 0 016 0v2"/></svg>
+      <h3>Baggage</h3>
+      <p>Allowances, extra bags, lost or delayed luggage.</p>
+    </button>
+    <button type="button" class="category-card" data-filter="checkin">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <h3>Check-in &amp; boarding</h3>
+      <p>Online check-in, boarding passes, seat selection.</p>
+    </button>
+    <button type="button" class="category-card" data-filter="changes">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18M7 3v4M17 3v4M5 6h14a2 2 0 012 2v11a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z"/></svg>
+      <h3>Flight changes</h3>
+      <p>Rebooking, date changes, cancellations.</p>
+    </button>
+    <button type="button" class="category-card" data-filter="refunds">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg>
+      <h3>Refunds</h3>
+      <p>Eligibility, timelines, and how to request one.</p>
+    </button>
+    <button type="button" class="category-card" data-filter="documents">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z"/><path d="M14 3v6h6"/></svg>
+      <h3>Travel documents</h3>
+      <p>Passports, visas, and entry requirements.</p>
+    </button>
+  </div>
+</section>
+
+<section class="faq wrap">
+  <h2>Frequently asked questions</h2>
+  <p class="subtitle">Can't find what you need? Use the search bar above or contact us below.</p>
+
+  <div id="faqList">
+
+    <div class="faq-item" data-category="booking changes">
+      <button type="button" class="faq-question">
+        Can I change the dates on my booking?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="faq-answer">
+        <p>Yes. Most fares allow free date changes up to 24 hours before departure. Go to Manage trip, select your booking, and choose "Change flight." Fare difference may apply if the new flight costs more.</p>
+      </div>
+    </div>
+
+    <div class="faq-item" data-category="baggage">
+      <button type="button" class="faq-question">
+        How much baggage is included in my fare?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="faq-answer">
+        <p>Every Economy fare includes one 23kg checked bag plus a carry-on. Premium Economy includes two checked bags, and Business includes three. Extra bags can be added during booking or from Manage trip for a flat per-bag fee.</p>
+      </div>
+    </div>
+
+    <div class="faq-item" data-category="checkin">
+      <button type="button" class="faq-question">
+        When does online check-in open?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="faq-answer">
+        <p>Online check-in opens 48 hours before departure and closes 90 minutes before an international flight, or 45 minutes before a domestic one. You can check in from the Check in link in the main menu.</p>
+      </div>
+    </div>
+
+    <div class="faq-item" data-category="refunds booking">
+      <button type="button" class="faq-question">
+        Am I eligible for a refund if I cancel?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="faq-answer">
+        <p>Flex and Premium fares are fully refundable up to 24 hours before departure. Value fares are non-refundable but can usually be converted to a travel credit. Refund requests are processed within 7–10 business days.</p>
+      </div>
+    </div>
+
+    <div class="faq-item" data-category="documents">
+      <button type="button" class="faq-question">
+        Do I need a visa for my destination?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="faq-answer">
+        <p>Visa requirements depend on your nationality and destination. We recommend checking with the relevant embassy or consulate at least a month before departure — entry rules can change with little notice.</p>
+      </div>
+    </div>
+
+    <div class="faq-item" data-category="baggage checkin">
+      <button type="button" class="faq-question">
+        What happens if my bag is delayed or lost?
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="faq-answer">
+        <p>Report it at the baggage desk before leaving the airport, or through Manage trip within 7 days. You'll get a reference number to track its status, and reasonable expenses may be reimbursed while it's located.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="no-results" id="noResults">No topics match your search. Try a different word, or contact us below.</p>
+</section>
+
+<section class="contact wrap">
+  <h2>Still need a hand?</h2>
+  <div class="contact-grid">
+    <div class="contact-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+      <h3>Live chat</h3>
+      <p>Chat with our support team, available 24/7 for urgent travel issues.</p>
+      <button type="button" class="action" data-action="chat">Start chat</button>
+    </div>
+    <div class="contact-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.8 19.8 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.8 19.8 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      <h3>Call us</h3>
+      <p>Speak to a representative for bookings, changes, or complex itineraries.</p>
+      <button type="button" class="action" data-action="phone">1800 555 0142</button>
+    </div>
+    <div class="contact-card">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg>
+      <h3>Email support</h3>
+      <p>For non-urgent requests. We typically reply within one business day.</p>
+      <button type="button" class="action" data-action="email">support@oceanicairways.example</button>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">Oceanic Airways is a fictional carrier — this page is a design sample.</div>
+</footer>
+
+<script>
+  // FAQ accordion
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const question = item.querySelector('.faq-question');
+    const answer = item.querySelector('.faq-answer');
+    question.addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(open => {
+        open.classList.remove('open');
+        open.querySelector('.faq-answer').style.maxHeight = null;
+      });
+      if (!isOpen) {
+        item.classList.add('open');
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+      }
+    });
+  });
+
+  // Category quick-filters
+  const searchInput = document.getElementById('faqSearch');
+  const faqItems = document.querySelectorAll('.faq-item');
+  const noResults = document.getElementById('noResults');
+
+  document.querySelectorAll('.category-card').forEach(card => {
+    card.addEventListener('click', () => {
+      searchInput.value = '';
+      const filter = card.dataset.filter;
+      let visibleCount = 0;
+      faqItems.forEach(item => {
+        const match = item.dataset.category.includes(filter);
+        item.classList.toggle('hidden', !match);
+        if (match) visibleCount++;
+      });
+      noResults.classList.toggle('show', visibleCount === 0);
+      document.getElementById('faqList').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Live text search across question + answer text
+  searchInput.addEventListener('input', () => {
+    const term = searchInput.value.trim().toLowerCase();
+    let visibleCount = 0;
+    faqItems.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      const match = term === '' || text.includes(term);
+      item.classList.toggle('hidden', !match);
+      if (match) visibleCount++;
+    });
+    noResults.classList.toggle('show', visibleCount === 0);
+  });
+
+  // Contact actions — demo only, no live chat/phone/email system connected
+  document.querySelectorAll('.contact-card .action').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const kind = btn.dataset.action;
+      if (kind === 'chat') {
+        alert('This is a design sample — live chat isn\'t connected yet.');
+      } else if (kind === 'phone') {
+        alert('This is a design sample phone number, not a working line.');
+      } else {
+        alert('This is a design sample email address, not a monitored inbox.');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
+```
 
