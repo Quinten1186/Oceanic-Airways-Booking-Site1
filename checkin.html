@@ -1,1 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oceanic Airways — Check in</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,ital@9..144,300,1;9..144,600,0;9..144,600,1&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+  :root{
+    --ink:        #0D2436;
+    --marine:     #163A52;
+    --marine-2:   #1E4A66;
+    --foam:       #EDEFEA;
+    --card:       #FBFAF7;
+    --brass:      #C0873E;
+    --brass-dark: #9C6C2B;
+    --text:       #12222B;
+    --muted:      #5E7481;
+    --line:       #D8DCD3;
+    --good:       #3E7A5C;
+    --radius:     4px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0;
+    background: var(--foam);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, .brand-word{ font-family:'Fraunces', Georgia, serif; }
+  .wrap{ max-width: 1120px; margin: 0 auto; padding-left: 28px; padding-right: 28px; }
+  a{ color:inherit; }
+  button{ font-family: inherit; cursor:pointer; }
+  input{ font-family: inherit; }
+
+  /* ---------- header ---------- */
+  .site-header{ background: var(--ink); color:#F4F4F0; }
+  .site-header .wrap{ display:flex; align-items:center; justify-content:space-between; height:68px; }
+  .wordmark{ display:flex; align-items:center; gap:10px; text-decoration:none; color:#F4F4F0; }
+  .wordmark svg{ width:22px; height:22px; }
+  .brand-word{ font-size:20px; font-weight:600; letter-spacing:0.02em; }
+  .site-nav{ display:flex; gap:28px; font-size:14px; }
+  .site-nav a{ text-decoration:none; color:#C9D2D6; padding-bottom:3px; border-bottom:1px solid transparent; transition: color .15s ease, border-color .15s ease; }
+  .site-nav a:hover{ color:#F4F4F0; border-color: var(--brass); }
+  .site-nav a.current{ color:#F4F4F0; border-color: var(--brass); }
+  @media (max-width:640px){ .site-nav{ display:none; } }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    background: linear-gradient(180deg, var(--ink) 0%, var(--marine) 100%);
+    color:#F4F4F0;
+    overflow:hidden;
+    padding-top: 64px;
+    padding-bottom: 140px;
+  }
+  .chart-lines{ position:absolute; inset:0; opacity:.5; pointer-events:none; }
+  .chart-lines svg{ width:100%; height:100%; }
+  .hero-inner{ position:relative; max-width: 560px; }
+  .hero-inner h1{
+    font-size: clamp(32px, 4.8vw, 46px);
+    font-weight:600;
+    line-height:1.15;
+    margin: 0 0 16px;
+  }
+  .hero-inner p{ font-size:15.5px; line-height:1.6; color:#C9D2D6; margin:0; max-width:46ch; }
+
+  /* ---------- check-in card ---------- */
+  .checkin-wrap{ position:relative; margin-top:-96px; padding-bottom:56px; }
+  .ticket-card{
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 48px -20px rgba(13,36,54,0.45);
+    overflow:hidden;
+  }
+  .ticket-header{
+    background: var(--ink);
+    color:#F4F4F0;
+    padding: 18px 32px;
+    font-size: 15px;
+    font-weight:600;
+  }
+  .ticket-body{ padding: 32px; }
+  .field label{ display:block; font-size:12px; color: var(--muted); margin-bottom:6px; font-weight:500; }
+  .field input{
+    width:100%;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 11px 12px;
+    font-size: 15px;
+    color: var(--text);
+    background:#fff;
+  }
+  .field input:focus, button:focus-visible{ outline: 2px solid var(--brass); outline-offset:1px; }
+  .field-row{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 22px;
+  }
+  .field-hint{ font-size:11.5px; color: var(--muted); margin-top:6px; }
+  .lookup-btn{
+    width:100%;
+    border:none;
+    border-radius: var(--radius);
+    background: var(--brass);
+    color: var(--ink);
+    font-size: 15px;
+    font-weight:600;
+    padding: 14px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .lookup-btn:hover{ background: var(--brass-dark); color:#F4F4F0; }
+  .lookup-btn svg{ width:16px; height:16px; }
+  .lookup-error{
+    display:none;
+    margin-top: 14px;
+    font-size: 13px;
+    color: #A5432E;
+    background: #FBEAE5;
+    border: 1px solid #EFC5B8;
+    border-radius: var(--radius);
+    padding: 10px 14px;
+  }
+  .lookup-error.show{ display:block; }
+  @media (max-width: 640px){
+    .ticket-body{ padding: 24px 20px; }
+    .field-row{ grid-template-columns: 1fr; }
+  }
+
+  /* ---------- boarding pass result ---------- */
+  .boarding-pass{
+    display:none;
+    margin-top: 20px;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 48px -20px rgba(13,36,54,0.35);
+    overflow:hidden;
+  }
+  .boarding-pass.show{ display:block; }
+  .bp-top{
+    background: var(--marine);
+    color:#F4F4F0;
+    padding: 18px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .bp-status{
+    display:flex; align-items:center; gap:8px;
+    font-size:13px; font-weight:600;
+  }
+  .bp-status .dot{ width:8px; height:8px; border-radius:50%; background: var(--good); }
+  .bp-main{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 28px;
+  }
+  .bp-route{
+    display:flex;
+    align-items:center;
+    gap: 18px;
+  }
+  .bp-airport{ text-align:center; }
+  .bp-airport .code{ font-size: 30px; font-weight:600; font-family:'Fraunces', serif; }
+  .bp-airport .name{ font-size:12px; color: var(--muted); }
+  .bp-arrow{ flex:1; height:1px; background: var(--line); position:relative; }
+  .bp-arrow svg{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:18px; height:18px; stroke: var(--marine-2); background: var(--card); }
+  .bp-details{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .bp-detail label{ display:block; font-size:11px; color: var(--muted); margin-bottom:4px; }
+  .bp-detail .val{ font-size: 15px; font-weight:600; }
+  .bp-perforation{
+    position:relative;
+    height:1px;
+    margin: 0 28px;
+    background-image: radial-gradient(circle, var(--line) 1.5px, transparent 1.5px);
+    background-size: 10px 1px;
+    background-repeat: repeat-x;
+    background-position: center;
+  }
+  .bp-perforation::before, .bp-perforation::after{
+    content:"";
+    position:absolute;
+    top:-11px;
+    width:22px; height:22px;
+    border-radius:50%;
+    background: var(--foam);
+  }
+  .bp-perforation::before{ left:-11px; }
+  .bp-perforation::after{ right:-11px; }
+  .bp-footer{
+    padding: 24px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:16px;
+  }
+  .bp-passenger{ font-size:13px; color: var(--muted); }
+  .bp-passenger strong{ display:block; font-size:16px; color: var(--text); font-family:'Fraunces', serif; font-weight:600; }
+  .bp-qr{
+    width:64px; height:64px;
+    border-radius: var(--radius);
+    background:
+      repeating-linear-gradient(90deg, var(--ink) 0 4px, transparent 4px 8px),
+      repeating-linear-gradient(0deg, var(--ink) 0 4px, transparent 4px 8px);
+    background-blend-mode: multiply;
+    opacity:.85;
+    flex-shrink:0;
+  }
+  .bp-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+  .bp-btn{
+    border:none;
+    border-radius: var(--radius);
+    padding: 11px 18px;
+    font-size: 13.5px;
+    font-weight:600;
+  }
+  .bp-btn.primary{ background: var(--brass); color: var(--ink); }
+  .bp-btn.primary:hover{ background: var(--brass-dark); color:#F4F4F0; }
+  .bp-btn.secondary{ background:#fff; border:1px solid var(--line); color: var(--marine-2); }
+  .bp-btn.secondary:hover{ border-color: var(--brass); }
+  @media (max-width: 700px){
+    .bp-main{ grid-template-columns: 1fr; }
+    .bp-details{ grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ---------- info strip ---------- */
+  .info-strip{
+    border-top: 1px solid var(--line);
+    padding: 40px 0 48px;
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+  .info-item{ display:flex; gap:14px; }
+  .info-item svg{ width:26px; height:26px; flex-shrink:0; stroke: var(--marine-2); margin-top:2px; }
+  .info-item h3{ margin: 0 0 4px; font-size: 14.5px; font-weight:600; }
+  .info-item p{ margin:0; font-size: 13.5px; color: var(--muted); line-height:1.5; }
+  @media (max-width: 760px){ .info-strip{ grid-template-columns: 1fr; } }
+
+  .site-footer{ background: var(--ink); color:#8FA0AA; font-size:12.5px; padding:22px 0; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="wordmark" href="oceanic-booking.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#F4F4F0" stroke-width="1.6"><path d="M2 16l6-2 4-8 2 .6-2.4 7.4 5-1.3.6 1.9L11 17l-1.5 4-1.7-.5.7-4.3-4.8 1.3z"/></svg>
+      <span class="brand-word">Oceanic</span>
+    </a>
+    <nav class="site-nav">
+      <a href="oceanic-booking.html">Book</a>
+      <a href="#">Manage trip</a>
+      <a href="#" class="current">Check in</a>
+      <a href="oceanic-help.html">Help</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="chart-lines" aria-hidden="true">
+    <svg viewBox="0 0 1120 400" preserveAspectRatio="xMidYMid slice">
+      <g fill="none" stroke="#3E6A82" stroke-width="1">
+        <path d="M-40 340 Q 300 270 640 320 T 1180 290"/>
+        <path d="M-40 380 Q 320 320 660 360 T 1180 330"/>
+      </g>
+    </svg>
+  </div>
+  <div class="wrap hero-inner">
+    <h1>Check in for your flight.</h1>
+    <p>Enter your booking reference and last name to check in and get your boarding pass — from 48 hours to 90 minutes before departure.</p>
+  </div>
+</section>
+
+<div class="wrap checkin-wrap">
+  <form class="ticket-card" id="checkinForm">
+    <div class="ticket-header">Find your booking</div>
+    <div class="ticket-body">
+      <div class="field-row">
+        <div class="field">
+          <label for="pnrInput">Booking reference</label>
+          <input id="pnrInput" type="text" maxlength="6" placeholder="e.g. 7QK4XM" value="7QK4XM" style="text-transform:uppercase;">
+        </div>
+        <div class="field">
+          <label for="lastNameInput">Last name</label>
+          <input id="lastNameInput" type="text" placeholder="e.g. Nguyen" value="Nguyen">
+        </div>
+      </div>
+      <p class="field-hint">Your 6-character booking reference is on your confirmation email, under "Booking reference" or "PNR."</p>
+
+      <button type="submit" class="lookup-btn" style="margin-top:22px;">
+        Find my booking
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      </button>
+
+      <p class="lookup-error" id="lookupError">We couldn't find a booking with that reference and last name. Double-check both and try again.</p>
+    </div>
+  </form>
+
+  <div class="boarding-pass" id="boardingPass">
+    <div class="bp-top">
+      <div class="bp-status"><span class="dot"></span> Checked in — boarding pass ready</div>
+      <div id="bpFlightCode">OA204 · Fri 20 Sep</div>
+    </div>
+    <div class="bp-main">
+      <div class="bp-route">
+        <div class="bp-airport"><div class="code">BNE</div><div class="name">Brisbane</div></div>
+        <div class="bp-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        </div>
+        <div class="bp-airport"><div class="code">NRT</div><div class="name">Tokyo Narita</div></div>
+      </div>
+      <div class="bp-details">
+        <div class="bp-detail"><label>Seat</label><div class="val">14C</div></div>
+        <div class="bp-detail"><label>Gate</label><div class="val">D12</div></div>
+        <div class="bp-detail"><label>Boarding</label><div class="val">09:50</div></div>
+        <div class="bp-detail"><label>Departs</label><div class="val">10:25</div></div>
+        <div class="bp-detail"><label>Cabin</label><div class="val">Economy</div></div>
+        <div class="bp-detail"><label>Group</label><div class="val">3</div></div>
+      </div>
+    </div>
+    <div class="bp-perforation" aria-hidden="true"></div>
+    <div class="bp-footer">
+      <div class="bp-passenger">
+        Passenger
+        <strong id="bpPassengerName">Nguyen / T.</strong>
+      </div>
+      <div class="bp-qr" role="img" aria-label="Boarding pass barcode placeholder"></div>
+      <div class="bp-actions">
+        <button type="button" class="bp-btn secondary" id="walletBtn">Add to wallet</button>
+        <button type="button" class="bp-btn primary" id="downloadBtn">Download PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="info-strip wrap">
+  <div class="info-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18M7 3v4M17 3v4M5 6h14a2 2 0 012 2v11a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z"/></svg>
+    <div>
+      <h3>Check-in window</h3>
+      <p>Opens 48 hours before departure, closes 90 minutes before for international flights.</p>
+    </div>
+  </div>
+  <div class="info-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9z"/><path d="M14 3v6h6"/></svg>
+    <div>
+      <h3>Documents needed</h3>
+      <p>A valid passport, and any visa required for your destination — checked automatically at check-in.</p>
+    </div>
+  </div>
+  <div class="info-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16v11a1 1 0 01-1 1H5a1 1 0 01-1-1V8zM9 8V6a3 3 0 016 0v2"/></svg>
+    <div>
+      <h3>Dropping off bags</h3>
+      <p>Bring checked luggage to the bag drop counter at least 60 minutes before departure.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">Oceanic Airways is a fictional carrier — this page is a design sample.</div>
+</footer>
+
+<script>
+  const form = document.getElementById('checkinForm');
+  const pnrInput = document.getElementById('pnrInput');
+  const lastNameInput = document.getElementById('lastNameInput');
+  const lookupError = document.getElementById('lookupError');
+  const boardingPass = document.getElementById('boardingPass');
+
+  // Force the reference field to read as uppercase while typing
+  pnrInput.addEventListener('input', () => {
+    pnrInput.value = pnrInput.value.toUpperCase();
+  });
+
+  // Demo "database": only this one reference + last name combination succeeds
+  const validPnr = '7QK4XM';
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const pnr = pnrInput.value.trim().toUpperCase();
+    const lastName = lastNameInput.value.trim();
+
+    if (pnr === validPnr && lastName.length > 0) {
+      lookupError.classList.remove('show');
+      document.getElementById('bpPassengerName').textContent =
+        `${lastName.toUpperCase()} / ${lastName.charAt(0).toUpperCase()}.`;
+      boardingPass.classList.add('show');
+      boardingPass.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      boardingPass.classList.remove('show');
+      lookupError.classList.add('show');
+    }
+  });
+
+  // Boarding pass actions — demo only
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    alert('This is a design sample — there\'s no real boarding pass file to download yet.');
+  });
+  document.getElementById('walletBtn').addEventListener('click', () => {
+    alert('This is a design sample — wallet integration isn\'t connected yet.');
+  });
+</script>
+
+</body>
+</html>
 
