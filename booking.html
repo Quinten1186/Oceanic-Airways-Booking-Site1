@@ -668,3 +668,49 @@ Booking Page
       <div class="route-price">from <strong>$710</strong> return</div>
       <button type="button" class="route-select" data-from="Cairns (CNS)" data-to="Hong Kong (HKG)">Use this route</button>
     </article>
+<head>
+  <style>
+    :root{ ...same color tokens as booking page... }
+    header, wordmark, nav          → same dark navy header
+    .summary-bar                   → marine strip showing route + dates, "Edit search" link back
+    .results-layout                → grid: 240px filter sidebar | flexible results column
+    .filters                       → sticky sidebar: stops, airline, departure time checkboxes, price slider
+    .sort-row / .sort-tabs         → Best / Cheapest / Fastest toggle
+    .flight-card                   → grid: airline+times | (spacer) | price+select button
+    .flight-path                   → the little dot-terminated line between times, shows stops
+    footer
+  </style>
+</head>
+
+<body>
+  <header>...</header>
+
+  <div class="summary-bar">
+    route + dates pulled from booking page → "Edit search" link
+  </div>
+
+  <div class="results-layout">
+    <aside class="filters">
+      Stops / Airline / Departure time checkboxes + price slider + Clear filters
+    </aside>
+
+    <main class="results-main">
+      Sort tabs (Best / Cheapest / Fastest)
+      <div id="flightList">
+        5x .flight-card  (one marked "best" with brass border + badge)
+      </div>
+      <button class="load-more">Show more flights</button>
+    </main>
+  </div>
+
+  <footer>...</footer>
+
+  <script>
+    - reads ?from=&to=&pax=&cabin=&depart=&return= from the URL and fills the summary bar
+    - sort tabs re-sort the cards by data-price / data-duration
+    - price slider hides cards over the max
+    - clear filters resets everything
+    - Select button → shows what was picked (placeholder until checkout exists)
+    - Show more → disables itself (no real pagination yet)
+  </script>
+</body>
