@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Oceanic Airways — Flight results</title>
+<title>Oceanic Airways — Seats &amp; baggage</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,ital@9..144,300,1;9..144,600,0;9..144,600,1&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 
@@ -18,7 +18,7 @@
     --text:       #12222B;
     --muted:      #5E7481;
     --line:       #D8DCD3;
-    --good:       #3E7A5C;
+    --taken:      #DCDFD8;
     --radius:     4px;
   }
 
@@ -31,20 +31,14 @@
     -webkit-font-smoothing: antialiased;
   }
   h1, h2, .brand-word{ font-family:'Fraunces', Georgia, serif; }
-  .wrap{
-    max-width: 1120px;
-    margin: 0 auto;
-    padding-left: 28px;
-    padding-right: 28px;
-  }
+  .wrap{ max-width: 1120px; margin: 0 auto; padding-left: 28px; padding-right: 28px; }
   a{ color:inherit; }
   button{ font-family: inherit; cursor:pointer; }
+  select{ font-family: inherit; }
 
   /* ---------- header ---------- */
   .site-header{ background: var(--ink); color:#F4F4F0; }
-  .site-header .wrap{
-    display:flex; align-items:center; justify-content:space-between; height:68px;
-  }
+  .site-header .wrap{ display:flex; align-items:center; justify-content:space-between; height:68px; }
   .wordmark{ display:flex; align-items:center; gap:10px; text-decoration:none; color:#F4F4F0; }
   .wordmark svg{ width:22px; height:22px; }
   .brand-word{ font-size:20px; font-weight:600; letter-spacing:0.02em; }
@@ -53,248 +47,256 @@
   .site-nav a.current{ color:#F4F4F0; border-color: var(--brass); }
   @media (max-width:640px){ .site-nav{ display:none; } }
 
-  /* ---------- search summary bar ---------- */
-  .summary-bar{
-    background: var(--marine);
-    color:#F4F4F0;
-  }
-  .summary-bar .wrap{
+  /* ---------- progress steps ---------- */
+  .progress-bar{ background: var(--marine); color:#F4F4F0; }
+  .steps{
     display:flex;
     align-items:center;
-    justify-content:space-between;
-    flex-wrap:wrap;
-    gap:12px;
-    padding: 18px 28px;
+    padding: 16px 28px;
+    max-width: 1120px;
+    margin: 0 auto;
+    gap: 0;
   }
-  .summary-route{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    font-size:17px;
-    font-weight:600;
-  }
-  .summary-route svg{ width:16px; height:16px; stroke:#C9D2D6; }
-  .summary-details{
-    font-size:13px;
-    color:#B9CAD1;
-    margin-top:2px;
-  }
-  .edit-search{
-    font-size:13px;
-    font-weight:600;
-    color:#F4F4F0;
-    text-decoration:none;
-    border-bottom:1px solid var(--brass);
-    padding-bottom:2px;
-    white-space:nowrap;
-  }
-
-  /* ---------- layout ---------- */
-  .results-layout{
-    display:grid;
-    grid-template-columns: 240px 1fr;
-    gap: 28px;
-    padding: 28px 0 60px;
-  }
-  @media (max-width: 860px){
-    .results-layout{ grid-template-columns: 1fr; }
-  }
-
-  /* ---------- filters ---------- */
-  .filters{
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 20px;
-    align-self:start;
-    position: sticky;
-    top: 20px;
-  }
-  .filters h2{
-    font-size: 15px;
-    font-weight: 600;
-    margin: 0 0 16px;
-    font-family: 'IBM Plex Sans', sans-serif;
-  }
-  .filter-group{ margin-bottom: 22px; }
-  .filter-group:last-child{ margin-bottom: 0; }
-  .filter-group h3{
-    font-size: 12px;
-    color: var(--muted);
-    font-weight: 600;
-    margin: 0 0 10px;
-  }
-  .filter-row{
+  .step{
     display:flex;
     align-items:center;
     gap:8px;
-    font-size: 13.5px;
-    margin-bottom: 8px;
+    font-size:13px;
+    color:#93A5AE;
+    white-space:nowrap;
   }
-  .filter-row input[type="checkbox"]{ accent-color: var(--brass-dark); width:15px; height:15px; }
-  .filter-row .count{ color: var(--muted); margin-left:auto; font-size:12px; }
-  .price-slider{ width:100%; accent-color: var(--brass-dark); margin-top:6px; }
-  .price-value{ font-size:13px; color: var(--muted); }
-  .clear-filters{
-    background:none; border:none; padding:0; margin-top:4px;
-    font-size:12.5px; color: var(--brass-dark); font-weight:600;
-    border-bottom:1px solid var(--brass-dark);
+  .step .num{
+    width:20px; height:20px;
+    border-radius:50%;
+    border:1px solid #4E6B7B;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px;
   }
-
-  /* ---------- results column ---------- */
-  .results-main{ min-width:0; }
-  .sort-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom: 16px;
-    flex-wrap:wrap;
-    gap:10px;
+  .step.done .num{ background: var(--brass); border-color: var(--brass); color: var(--ink); font-weight:700; }
+  .step.done{ color:#F4F4F0; }
+  .step.active .num{ border-color: var(--brass); color:#F4F4F0; }
+  .step.active{ color:#F4F4F0; font-weight:600; }
+  .step-connector{
+    flex:1;
+    height:1px;
+    background:#3A5164;
+    margin: 0 12px;
+    min-width: 20px;
   }
-  .result-count{ font-size: 13.5px; color: var(--muted); }
-  .sort-tabs{ display:flex; gap:6px; }
-  .sort-tab{
-    background:#fff;
-    border:1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 8px 14px;
-    font-size: 13px;
-    font-weight:500;
-    color: var(--muted);
-  }
-  .sort-tab.active{
-    background: var(--ink);
-    border-color: var(--ink);
-    color:#F4F4F0;
+  @media (max-width:700px){
+    .step span.label{ display:none; }
+    .step-connector{ margin:0 6px; }
   }
 
-  .flight-card{
+  /* ---------- summary bar ---------- */
+  .summary-bar{ background: var(--ink); border-top:1px solid #1D3A4D; color:#F4F4F0; }
+  .summary-bar .wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:10px; padding: 14px 28px;
+  }
+  .summary-route{ display:flex; align-items:center; gap:10px; font-size:15px; font-weight:600; }
+  .summary-route svg{ width:14px; height:14px; stroke:#C9D2D6; }
+  .summary-details{ font-size:12.5px; color:#B9CAD1; margin-top:2px; }
+  .edit-search{ font-size:13px; font-weight:600; color:#F4F4F0; text-decoration:none; border-bottom:1px solid var(--brass); padding-bottom:2px; }
+
+  /* ---------- layout ---------- */
+  .page-layout{
+    display:grid;
+    grid-template-columns: 1fr 300px;
+    gap: 28px;
+    padding: 28px 0 60px;
+  }
+  @media (max-width: 900px){
+    .page-layout{ grid-template-columns: 1fr; }
+  }
+
+  .panel{
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: 20px 22px;
-    margin-bottom: 14px;
+    padding: 24px;
+    margin-bottom: 22px;
+  }
+  .panel h2{ font-size: 19px; font-weight:600; margin: 0 0 4px; }
+  .panel .subtitle{ font-size:13.5px; color: var(--muted); margin: 0 0 20px; }
+
+  /* ---------- seat map ---------- */
+  .seat-map-wrap{ display:flex; gap:32px; flex-wrap:wrap; }
+  .cabin{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius: 18px 18px 6px 6px;
+    padding: 20px 16px;
+  }
+  .seat-row{
     display:grid;
-    grid-template-columns: 1fr auto auto;
-    gap: 20px;
+    grid-template-columns: repeat(3,32px) 18px repeat(3,32px);
+    gap:6px;
+    margin-bottom:6px;
     align-items:center;
   }
-  .flight-card.best{ border-color: var(--brass); box-shadow: 0 0 0 1px var(--brass); }
-  .flight-airline{
-    display:flex; align-items:center; gap:10px;
-    font-size: 13px; color: var(--muted); margin-bottom:10px;
+  .seat{
+    width:32px; height:32px;
+    border-radius:6px 6px 3px 3px;
+    border:1px solid var(--line);
+    background:#fff;
+    font-size:10px;
+    color: var(--muted);
+    display:flex; align-items:center; justify-content:center;
   }
-  .flight-airline .dot{ width:7px; height:7px; border-radius:50%; background: var(--marine-2); }
-  .badge{
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--brass-dark);
-    background: #F3E8D3;
-    padding: 2px 8px;
-    border-radius: 10px;
-    margin-left: 4px;
-  }
-  .flight-times{
-    display:flex;
-    align-items:center;
-    gap: 18px;
-  }
-  .time-block{ text-align:center; }
-  .time-block .time{ font-size: 20px; font-weight:600; font-family:'Fraunces', serif; }
-  .time-block .code{ font-size:12px; color: var(--muted); }
-  .flight-path{
+  .seat:hover:not(.taken):not(.selected){ border-color: var(--brass); }
+  .seat.legroom{ background:#FDF6EA; border-color:#E9CFA0; }
+  .seat.taken{ background: var(--taken); color:#A8AEA4; cursor:not-allowed; border-color:var(--taken); }
+  .seat.selected{ background: var(--brass); border-color: var(--brass); color: var(--ink); font-weight:700; }
+  .aisle-gap{ width:18px; }
+
+  .seat-legend{
     display:flex;
     flex-direction:column;
-    align-items:center;
-    gap:2px;
-    min-width: 130px;
+    gap:12px;
+    font-size:13px;
+    color: var(--muted);
+    min-width: 170px;
+    padding-top: 6px;
   }
-  .flight-path .duration{ font-size:12px; color: var(--muted); }
-  .flight-path .line{
-    width:100%;
-    height:1px;
-    background: var(--line);
+  .legend-item{ display:flex; align-items:center; gap:10px; }
+  .legend-swatch{ width:20px; height:20px; border-radius:5px 5px 2px 2px; border:1px solid var(--line); }
+  .legend-swatch.legroom{ background:#FDF6EA; border-color:#E9CFA0; }
+  .legend-swatch.taken{ background: var(--taken); border-color:var(--taken); }
+  .legend-swatch.selected{ background: var(--brass); border-color: var(--brass); }
+  .legend-note{ font-size:12px; color: var(--muted); margin-top:8px; line-height:1.5; }
+  .selected-seat-readout{
+    margin-top: 14px;
+    font-size:13.5px;
+    color: var(--text);
+    font-weight:600;
+  }
+  .selected-seat-readout span{ color: var(--brass-dark); }
+
+  /* ---------- extras ---------- */
+  .extra-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .extra-row:last-child{ border-bottom:none; }
+  .extra-info h3{ margin:0 0 4px; font-size:14.5px; font-weight:600; }
+  .extra-info p{ margin:0; font-size:13px; color: var(--muted); max-width:46ch; }
+  .extra-control{ flex-shrink:0; display:flex; align-items:center; gap:10px; }
+  .extra-price{ font-size:13px; color: var(--muted); min-width:60px; text-align:right; }
+
+  .stepper{
+    display:flex; align-items:center; gap:10px;
+    border:1px solid var(--line); border-radius: var(--radius); padding:6px 10px; background:#fff;
+  }
+  .stepper button{
+    width:24px; height:24px; border-radius:50%;
+    border:1px solid var(--line); background:#fff; color: var(--marine-2);
+    display:flex; align-items:center; justify-content:center; font-size:14px;
+  }
+  .stepper button:hover{ border-color: var(--brass); }
+
+  .toggle{
     position:relative;
+    width:42px; height:24px;
+    border-radius:12px;
+    background: var(--line);
+    border:none;
+    flex-shrink:0;
   }
-  .flight-path .line::after{
+  .toggle::after{
     content:"";
     position:absolute;
-    right:0; top:50%;
-    width:6px; height:6px;
+    top:2px; left:2px;
+    width:20px; height:20px;
     border-radius:50%;
-    background: var(--marine-2);
-    transform: translateY(-50%);
-  }
-  .flight-path .stops{ font-size:11.5px; color: var(--muted); }
-  .flight-path .stops.direct{ color: var(--good); }
-
-  .flight-price{ text-align:right; }
-  .flight-price .amount{
-    font-size: 22px;
-    font-weight:600;
-    font-family: 'Fraunces', serif;
-    display:block;
-  }
-  .flight-price .per{ font-size:11.5px; color: var(--muted); }
-  .select-btn{
-    margin-top: 10px;
-    border:none;
-    border-radius: var(--radius);
-    background: var(--brass);
-    color: var(--ink);
-    font-size: 13.5px;
-    font-weight:600;
-    padding: 10px 18px;
-  }
-  .select-btn:hover{ background: var(--brass-dark); color:#F4F4F0; }
-
-  @media (max-width: 700px){
-    .flight-card{ grid-template-columns: 1fr; text-align:left; }
-    .flight-price{ text-align:left; }
-    .flight-times{ flex-wrap:wrap; }
-  }
-
-  .load-more{
-    width:100%;
     background:#fff;
+    transition: left .15s ease;
+  }
+  .toggle.on{ background: var(--brass); }
+  .toggle.on::after{ left:20px; }
+
+  select.meal-select{
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 9px 10px;
+    font-size:13.5px;
+    background:#fff;
+    color: var(--text);
+  }
+
+  /* ---------- sidebar summary ---------- */
+  .price-panel{
+    background: var(--card);
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: 14px;
-    font-size: 14px;
-    font-weight:600;
-    color: var(--marine-2);
-    margin-top: 8px;
+    padding: 22px;
+    position: sticky;
+    top: 20px;
   }
-  .load-more:hover{ border-color: var(--brass); }
+  .price-panel h2{ font-size:16px; font-weight:600; margin:0 0 14px; }
+  .price-line{
+    display:flex; justify-content:space-between;
+    font-size:13.5px; color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .price-line span:last-child{ color: var(--text); font-weight:500; }
+  .price-total{
+    display:flex; justify-content:space-between;
+    align-items:baseline;
+    border-top:1px solid var(--line);
+    margin-top:12px; padding-top:14px;
+    font-size:14px; font-weight:600;
+  }
+  .price-total .amount{ font-size:22px; font-family:'Fraunces', serif; color: var(--text); }
+  .continue-btn{
+    width:100%; margin-top:18px;
+    border:none; border-radius: var(--radius);
+    background: var(--brass); color: var(--ink);
+    font-size:15px; font-weight:600; padding:14px;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .continue-btn:hover{ background: var(--brass-dark); color:#F4F4F0; }
+  .continue-btn:disabled{ opacity:.5; cursor:not-allowed; }
+  .continue-btn svg{ width:16px; height:16px; }
+  .price-note{ font-size:11.5px; color: var(--muted); margin-top:10px; line-height:1.5; }
 
-  .site-footer{
-    background: var(--ink);
-    color: #8FA0AA;
-    font-size: 12.5px;
-    padding: 22px 0;
-  }
+  .site-footer{ background: var(--ink); color:#8FA0AA; font-size:12.5px; padding:22px 0; }
 
-  @media (prefers-reduced-motion: reduce){
-    *{ transition:none !important; animation:none !important; }
-  }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
 </style>
 </head>
 <body>
 
 <header class="site-header">
   <div class="wrap">
-    <a class="wordmark" href="#">
+    <a class="wordmark" href="oceanic-booking.html">
       <svg viewBox="0 0 24 24" fill="none" stroke="#F4F4F0" stroke-width="1.6"><path d="M2 16l6-2 4-8 2 .6-2.4 7.4 5-1.3.6 1.9L11 17l-1.5 4-1.7-.5.7-4.3-4.8 1.3z"/></svg>
       <span class="brand-word">Oceanic</span>
     </a>
     <nav class="site-nav">
-      <a href="#" class="current">Book</a>
+      <a href="oceanic-booking.html">Book</a>
       <a href="#">Manage trip</a>
-      <a href="#">Check in</a>
-      <a href="#">Help</a>
+      <a href="oceanic-checkin.html">Check in</a>
+      <a href="oceanic-help.html">Help</a>
     </nav>
   </div>
 </header>
+
+<div class="progress-bar">
+  <div class="steps">
+    <div class="step done"><span class="num">✓</span><span class="label">Flights</span></div>
+    <div class="step-connector"></div>
+    <div class="step active"><span class="num">2</span><span class="label">Seats &amp; bags</span></div>
+    <div class="step-connector"></div>
+    <div class="step"><span class="num">3</span><span class="label">Passenger details</span></div>
+    <div class="step-connector"></div>
+    <div class="step"><span class="num">4</span><span class="label">Payment</span></div>
+  </div>
+</div>
 
 <div class="summary-bar">
   <div class="wrap">
@@ -304,168 +306,108 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
         <span id="summaryTo">Tokyo Narita (NRT)</span>
       </div>
-      <div class="summary-details" id="summaryDetails">Fri 20 Sep – Fri 27 Sep · 1 adult · Economy</div>
+      <div class="summary-details" id="summaryDetails">OA204 · 1 adult · Economy</div>
     </div>
-    <a href="oceanic-booking.html" class="edit-search">Edit search</a>
+    <a href="oceanic-results.html" class="edit-search">Change flight</a>
   </div>
 </div>
 
-<div class="wrap results-layout">
+<div class="wrap page-layout">
 
-  <aside class="filters">
-    <h2>Filter results</h2>
+  <main>
+    <section class="panel">
+      <h2>Choose your seat</h2>
+      <p class="subtitle">Tap an available seat below. Extra legroom rows cost a little more.</p>
 
-    <div class="filter-group">
-      <h3>Stops</h3>
-      <label class="filter-row"><input type="checkbox" checked><span>Direct</span><span class="count">6</span></label>
-      <label class="filter-row"><input type="checkbox" checked><span>1 stop</span><span class="count">9</span></label>
-      <label class="filter-row"><input type="checkbox"><span>2+ stops</span><span class="count">3</span></label>
-    </div>
+      <div class="seat-map-wrap">
+        <div class="cabin" id="cabin"></div>
 
-    <div class="filter-group">
-      <h3>Airline</h3>
-      <label class="filter-row"><input type="checkbox" checked><span>Oceanic Airways</span><span class="count">8</span></label>
-      <label class="filter-row"><input type="checkbox" checked><span>Pacific Blue</span><span class="count">5</span></label>
-      <label class="filter-row"><input type="checkbox" checked><span>Coral Air</span><span class="count">5</span></label>
-    </div>
-
-    <div class="filter-group">
-      <h3>Departure time</h3>
-      <label class="filter-row"><input type="checkbox" checked><span>Morning</span><span class="count">7</span></label>
-      <label class="filter-row"><input type="checkbox" checked><span>Afternoon</span><span class="count">6</span></label>
-      <label class="filter-row"><input type="checkbox" checked><span>Evening</span><span class="count">5</span></label>
-    </div>
-
-    <div class="filter-group">
-      <h3>Max price</h3>
-      <input type="range" min="600" max="1600" value="1600" class="price-slider" id="priceSlider">
-      <div class="price-value" id="priceValue">Up to $1,600</div>
-    </div>
-
-    <button type="button" class="clear-filters" id="clearFilters">Clear all filters</button>
-  </aside>
-
-  <main class="results-main">
-    <div class="sort-row">
-      <div class="result-count" id="resultCount">18 flights found</div>
-      <div class="sort-tabs">
-        <button type="button" class="sort-tab active" data-sort="best">Best</button>
-        <button type="button" class="sort-tab" data-sort="cheapest">Cheapest</button>
-        <button type="button" class="sort-tab" data-sort="fastest">Fastest</button>
+        <div class="seat-legend">
+          <div class="legend-item"><span class="legend-swatch"></span> Standard — $0</div>
+          <div class="legend-item"><span class="legend-swatch legroom"></span> Extra legroom — $35</div>
+          <div class="legend-item"><span class="legend-swatch taken"></span> Already taken</div>
+          <div class="legend-item"><span class="legend-swatch selected"></span> Your seat</div>
+          <p class="legend-note">Seat map shown is representative of a typical Economy cabin and may vary by aircraft.</p>
+          <div class="selected-seat-readout" id="seatReadout">No seat selected yet</div>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div id="flightList">
+    <section class="panel">
+      <h2>Baggage &amp; extras</h2>
+      <p class="subtitle">Your fare already includes one 23kg checked bag.</p>
 
-      <article class="flight-card best" data-price="780" data-duration="580">
-        <div>
-          <div class="flight-airline"><span class="dot"></span> Oceanic Airways · OA204 <span class="badge">Best value</span></div>
-          <div class="flight-times">
-            <div class="time-block"><div class="time">10:25</div><div class="code">BNE</div></div>
-            <div class="flight-path">
-              <div class="duration">9h 40m</div>
-              <div class="line"></div>
-              <div class="stops direct">Direct</div>
-            </div>
-            <div class="time-block"><div class="time">19:05</div><div class="code">NRT</div></div>
+      <div class="extra-row">
+        <div class="extra-info">
+          <h3>Extra checked bag</h3>
+          <p>Add up to 3 additional 23kg bags for this trip.</p>
+        </div>
+        <div class="extra-control">
+          <div class="stepper">
+            <button type="button" id="bagMinus">–</button>
+            <span id="bagCount">0</span>
+            <button type="button" id="bagPlus">+</button>
           </div>
+          <span class="extra-price">$70 each</span>
         </div>
-        <div></div>
-        <div class="flight-price">
-          <span class="amount">$780</span>
-          <span class="per">per adult, return</span>
-          <button type="button" class="select-btn">Select</button>
-        </div>
-      </article>
+      </div>
 
-      <article class="flight-card" data-price="705" data-duration="640">
-        <div>
-          <div class="flight-airline"><span class="dot"></span> Coral Air · CA118</div>
-          <div class="flight-times">
-            <div class="time-block"><div class="time">07:10</div><div class="code">BNE</div></div>
-            <div class="flight-path">
-              <div class="duration">10h 40m</div>
-              <div class="line"></div>
-              <div class="stops">1 stop · SIN</div>
-            </div>
-            <div class="time-block"><div class="time">17:50</div><div class="code">NRT</div></div>
-          </div>
+      <div class="extra-row">
+        <div class="extra-info">
+          <h3>Priority boarding</h3>
+          <p>Board first and get settled with extra time for overhead space.</p>
         </div>
-        <div></div>
-        <div class="flight-price">
-          <span class="amount">$705</span>
-          <span class="per">per adult, return</span>
-          <button type="button" class="select-btn">Select</button>
+        <div class="extra-control">
+          <button type="button" class="toggle" id="priorityToggle" aria-pressed="false"></button>
+          <span class="extra-price">$25</span>
         </div>
-      </article>
+      </div>
 
-      <article class="flight-card" data-price="915" data-duration="560">
-        <div>
-          <div class="flight-airline"><span class="dot"></span> Pacific Blue · PB552</div>
-          <div class="flight-times">
-            <div class="time-block"><div class="time">14:05</div><div class="code">BNE</div></div>
-            <div class="flight-path">
-              <div class="duration">9h 20m</div>
-              <div class="line"></div>
-              <div class="stops direct">Direct</div>
-            </div>
-            <div class="time-block"><div class="time">22:25</div><div class="code">NRT</div></div>
-          </div>
+      <div class="extra-row">
+        <div class="extra-info">
+          <h3>Travel insurance</h3>
+          <p>Cover for trip cancellation, delays, and lost luggage.</p>
         </div>
-        <div></div>
-        <div class="flight-price">
-          <span class="amount">$915</span>
-          <span class="per">per adult, return</span>
-          <button type="button" class="select-btn">Select</button>
+        <div class="extra-control">
+          <button type="button" class="toggle" id="insuranceToggle" aria-pressed="false"></button>
+          <span class="extra-price">$45</span>
         </div>
-      </article>
+      </div>
 
-      <article class="flight-card" data-price="640" data-duration="710">
-        <div>
-          <div class="flight-airline"><span class="dot"></span> Oceanic Airways · OA771</div>
-          <div class="flight-times">
-            <div class="time-block"><div class="time">22:15</div><div class="code">BNE</div></div>
-            <div class="flight-path">
-              <div class="duration">11h 50m</div>
-              <div class="line"></div>
-              <div class="stops">1 stop · MNL</div>
-            </div>
-            <div class="time-block"><div class="time">11:05+1</div><div class="code">NRT</div></div>
-          </div>
+      <div class="extra-row">
+        <div class="extra-info">
+          <h3>Meal preference</h3>
+          <p>Let the crew know ahead of time — no extra charge.</p>
         </div>
-        <div></div>
-        <div class="flight-price">
-          <span class="amount">$640</span>
-          <span class="per">per adult, return</span>
-          <button type="button" class="select-btn">Select</button>
+        <div class="extra-control">
+          <select class="meal-select" id="mealSelect">
+            <option>Standard</option>
+            <option>Vegetarian</option>
+            <option>Vegan</option>
+            <option>Gluten-free</option>
+            <option>Halal</option>
+            <option>Kosher</option>
+          </select>
         </div>
-      </article>
-
-      <article class="flight-card" data-price="1120" data-duration="540">
-        <div>
-          <div class="flight-airline"><span class="dot"></span> Oceanic Airways · OA204 <span class="badge">Extra legroom</span></div>
-          <div class="flight-times">
-            <div class="time-block"><div class="time">10:25</div><div class="code">BNE</div></div>
-            <div class="flight-path">
-              <div class="duration">9h 00m</div>
-              <div class="line"></div>
-              <div class="stops direct">Direct</div>
-            </div>
-            <div class="time-block"><div class="time">18:25</div><div class="code">NRT</div></div>
-          </div>
-        </div>
-        <div></div>
-        <div class="flight-price">
-          <span class="amount">$1,120</span>
-          <span class="per">per adult, return</span>
-          <button type="button" class="select-btn">Select</button>
-        </div>
-      </article>
-
-    </div>
-
-    <button type="button" class="load-more">Show more flights</button>
+      </div>
+    </section>
   </main>
+
+  <aside class="price-panel">
+    <h2>Price summary</h2>
+    <div class="price-line"><span>Flight fare</span><span id="fareLine">$780</span></div>
+    <div class="price-line"><span>Seat</span><span id="seatLine">$0</span></div>
+    <div class="price-line"><span>Extra bags</span><span id="bagLine">$0</span></div>
+    <div class="price-line"><span>Priority boarding</span><span id="priorityLine">$0</span></div>
+    <div class="price-line"><span>Travel insurance</span><span id="insuranceLine">$0</span></div>
+    <div class="price-total"><span>Total</span><span class="amount" id="totalAmount">$780</span></div>
+
+    <button type="button" class="continue-btn" id="continueBtn">
+      Continue to passenger details
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    </button>
+    <p class="price-note">Prices shown are per adult passenger and update as you make selections.</p>
+  </aside>
 
 </div>
 
@@ -474,73 +416,118 @@
 </footer>
 
 <script>
-  // Pull search details from the previous page via URL params, with sensible fallbacks
+  // Pull details carried over from the results page
   const params = new URLSearchParams(window.location.search);
   const from = params.get('from') || 'Brisbane (BNE)';
   const to = params.get('to') || 'Tokyo Narita (NRT)';
   const pax = params.get('pax') || '1 adult';
   const cabin = params.get('cabin') || 'Economy';
-  const depart = params.get('depart');
-  const ret = params.get('return');
+  const flightCode = params.get('flight') || 'OA204';
+  const fare = Number(params.get('fare') || 780);
 
   document.getElementById('summaryFrom').textContent = from;
   document.getElementById('summaryTo').textContent = to;
-  document.getElementById('summaryDetails').textContent =
-    (depart ? `${depart}${ret ? ' – ' + ret : ''} · ` : '') + `${pax} · ${cabin}`;
+  document.getElementById('summaryDetails').textContent = `${flightCode} · ${pax} · ${cabin}`;
+  document.getElementById('fareLine').textContent = `$${fare.toLocaleString()}`;
+  document.getElementById('totalAmount').textContent = `$${fare.toLocaleString()}`;
 
-  // Sort tabs
-  const sortTabs = document.querySelectorAll('.sort-tab');
-  const flightList = document.getElementById('flightList');
-  sortTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      sortTabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      const cards = Array.from(flightList.children);
-      const sortKey = tab.dataset.sort;
-      cards.sort((a, b) => {
-        if (sortKey === 'cheapest') return a.dataset.price - b.dataset.price;
-        if (sortKey === 'fastest') return a.dataset.duration - b.dataset.duration;
-        return 0; // "best" keeps the original curated order
-      });
-      cards.forEach(card => flightList.appendChild(card));
+  // ---- Build the seat map ----
+  const cabinEl = document.getElementById('cabin');
+  const totalRows = 10;
+  const legroomRows = [1, 2];
+  const takenSeats = new Set(['1A','2F','3C','3D','5B','6E','7A','7F','8C','9D']);
+  const letters = ['A','B','C','D','E','F'];
+  let selectedSeat = null;
+  let selectedSeatPrice = 0;
+
+  for (let r = 1; r <= totalRows; r++) {
+    const row = document.createElement('div');
+    row.className = 'seat-row';
+    letters.forEach((letter, i) => {
+      if (i === 3) {
+        const gap = document.createElement('div');
+        gap.className = 'aisle-gap';
+        row.appendChild(gap);
+      }
+      const seatId = `${r}${letter}`;
+      const seat = document.createElement('button');
+      seat.type = 'button';
+      seat.className = 'seat';
+      seat.textContent = seatId;
+      const isLegroom = legroomRows.includes(r);
+      if (isLegroom) seat.classList.add('legroom');
+      if (takenSeats.has(seatId)) {
+        seat.classList.add('taken');
+        seat.disabled = true;
+      } else {
+        seat.addEventListener('click', () => selectSeat(seat, seatId, isLegroom ? 35 : 0));
+      }
+      row.appendChild(seat);
     });
+    cabinEl.appendChild(row);
+  }
+
+  function selectSeat(seatEl, seatId, price) {
+    document.querySelectorAll('.seat.selected').forEach(s => s.classList.remove('selected'));
+    seatEl.classList.add('selected');
+    selectedSeat = seatId;
+    selectedSeatPrice = price;
+    document.getElementById('seatReadout').innerHTML = `Seat <span>${seatId}</span> selected`;
+    document.getElementById('seatLine').textContent = `$${price}`;
+    updateTotal();
+  }
+
+  // ---- Extra bags stepper ----
+  let bagCount = 0;
+  const bagCountEl = document.getElementById('bagCount');
+  document.getElementById('bagPlus').addEventListener('click', () => {
+    if (bagCount < 3) bagCount++;
+    bagCountEl.textContent = bagCount;
+    document.getElementById('bagLine').textContent = `$${bagCount * 70}`;
+    updateTotal();
+  });
+  document.getElementById('bagMinus').addEventListener('click', () => {
+    if (bagCount > 0) bagCount--;
+    bagCountEl.textContent = bagCount;
+    document.getElementById('bagLine').textContent = `$${bagCount * 70}`;
+    updateTotal();
   });
 
-  // Price slider
-  const slider = document.getElementById('priceSlider');
-  const priceValue = document.getElementById('priceValue');
-  slider.addEventListener('input', () => {
-    priceValue.textContent = `Up to $${Number(slider.value).toLocaleString()}`;
-    document.querySelectorAll('.flight-card').forEach(card => {
-      card.style.display = Number(card.dataset.price) <= Number(slider.value) ? '' : 'none';
-    });
+  // ---- Toggles ----
+  let priorityOn = false;
+  let insuranceOn = false;
+  document.getElementById('priorityToggle').addEventListener('click', function(){
+    priorityOn = !priorityOn;
+    this.classList.toggle('on', priorityOn);
+    this.setAttribute('aria-pressed', priorityOn);
+    document.getElementById('priorityLine').textContent = priorityOn ? '$25' : '$0';
+    updateTotal();
+  });
+  document.getElementById('insuranceToggle').addEventListener('click', function(){
+    insuranceOn = !insuranceOn;
+    this.classList.toggle('on', insuranceOn);
+    this.setAttribute('aria-pressed', insuranceOn);
+    document.getElementById('insuranceLine').textContent = insuranceOn ? '$45' : '$0';
+    updateTotal();
   });
 
-  // Clear filters
-  document.getElementById('clearFilters').addEventListener('click', () => {
-    document.querySelectorAll('.filter-row input[type="checkbox"]').forEach(cb => cb.checked = true);
-    slider.value = 1600;
-    priceValue.textContent = 'Up to $1,600';
-    document.querySelectorAll('.flight-card').forEach(card => card.style.display = '');
-  });
+  function updateTotal(){
+    const total = fare + selectedSeatPrice + (bagCount * 70) + (priorityOn ? 25 : 0) + (insuranceOn ? 45 : 0);
+    document.getElementById('totalAmount').textContent = `$${total.toLocaleString()}`;
+  }
 
-  // Select flight — the next page (seats & baggage) isn't built yet, so this is the end of the flow for now
-  document.querySelectorAll('.select-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const card = btn.closest('.flight-card');
-      const amount = card.querySelector('.amount').textContent;
-      const airline = card.querySelector('.flight-airline').textContent.trim();
-      alert(`You selected: ${airline}\n${amount} per adult, return.\n\nThe next step (seats & baggage) hasn't been built yet — that's where this flow will continue.`);
-    });
-  });
-
-  // "Show more" just reveals a note — no real pagination in this demo
-  document.querySelector('.load-more').addEventListener('click', function(){
-    this.textContent = 'No more flights match this search';
-    this.disabled = true;
-    this.style.opacity = '0.6';
+  // ---- Continue button (demo only — no passenger details page yet) ----
+  document.getElementById('continueBtn').addEventListener('click', () => {
+    if (!selectedSeat) {
+      alert('Please choose a seat before continuing.');
+      return;
+    }
+    alert(`Seat ${selectedSeat} confirmed, ${bagCount} extra bag(s), meal: ${document.getElementById('mealSelect').value}.\n\nThe next step (passenger details) hasn't been built yet — that's where this flow will continue.`);
   });
 </script>
 
 </body>
 </html>
+
+
+
