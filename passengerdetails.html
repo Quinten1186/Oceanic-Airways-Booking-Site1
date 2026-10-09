@@ -1,1 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oceanic Airways — Flight results</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,ital@9..144,300,1;9..144,600,0;9..144,600,1&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 
+  :root{
+    --ink:        #0D2436;
+    --marine:     #163A52;
+    --marine-2:   #1E4A66;
+    --foam:       #EDEFEA;
+    --card:       #FBFAF7;
+    --brass:      #C0873E;
+    --brass-dark: #9C6C2B;
+    --text:       #12222B;
+    --muted:      #5E7481;
+    --line:       #D8DCD3;
+    --good:       #3E7A5C;
+    --radius:     4px;
+  }
+
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    background: var(--foam);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, .brand-word{ font-family:'Fraunces', Georgia, serif; }
+  .wrap{
+    max-width: 1120px;
+    margin: 0 auto;
+    padding-left: 28px;
+    padding-right: 28px;
+  }
+  a{ color:inherit; }
+  button{ font-family: inherit; cursor:pointer; }
+
+  /* ---------- header ---------- */
+  .site-header{ background: var(--ink); color:#F4F4F0; }
+  .site-header .wrap{
+    display:flex; align-items:center; justify-content:space-between; height:68px;
+  }
+  .wordmark{ display:flex; align-items:center; gap:10px; text-decoration:none; color:#F4F4F0; }
+  .wordmark svg{ width:22px; height:22px; }
+  .brand-word{ font-size:20px; font-weight:600; letter-spacing:0.02em; }
+  .site-nav{ display:flex; gap:28px; font-size:14px; }
+  .site-nav a{ text-decoration:none; color:#C9D2D6; padding-bottom:3px; border-bottom:1px solid transparent; }
+  .site-nav a.current{ color:#F4F4F0; border-color: var(--brass); }
+  @media (max-width:640px){ .site-nav{ display:none; } }
+
+  /* ---------- search summary bar ---------- */
+  .summary-bar{
+    background: var(--marine);
+    color:#F4F4F0;
+  }
+  .summary-bar .wrap{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
+    padding: 18px 28px;
+  }
+  .summary-route{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:17px;
+    font-weight:600;
+  }
+  .summary-route svg{ width:16px; height:16px; stroke:#C9D2D6; }
+  .summary-details{
+    font-size:13px;
+    color:#B9CAD1;
+    margin-top:2px;
+  }
+  .edit-search{
+    font-size:13px;
+    font-weight:600;
+    color:#F4F4F0;
+    text-decoration:none;
+    border-bottom:1px solid var(--brass);
+    padding-bottom:2px;
+    white-space:nowrap;
+  }
+
+  /* ---------- layout ---------- */
+  .results-layout{
+    display:grid;
+    grid-template-columns: 240px 1fr;
+    gap: 28px;
+    padding: 28px 0 60px;
+  }
+  @media (max-width: 860px){
+    .results-layout{ grid-template-columns: 1fr; }
+  }
+
+  /* ---------- filters ---------- */
+  .filters{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    align-self:start;
+    position: sticky;
+    top: 20px;
+  }
+  .filters h2{
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 16px;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .filter-group{ margin-bottom: 22px; }
+  .filter-group:last-child{ margin-bottom: 0; }
+  .filter-group h3{
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+  .filter-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size: 13.5px;
+    margin-bottom: 8px;
+  }
+  .filter-row input[type="checkbox"]{ accent-color: var(--brass-dark); width:15px; height:15px; }
+  .filter-row .count{ color: var(--muted); margin-left:auto; font-size:12px; }
+  .price-slider{ width:100%; accent-color: var(--brass-dark); margin-top:6px; }
+  .price-value{ font-size:13px; color: var(--muted); }
+  .clear-filters{
+    background:none; border:none; padding:0; margin-top:4px;
+    font-size:12.5px; color: var(--brass-dark); font-weight:600;
+    border-bottom:1px solid var(--brass-dark);
+  }
+
+  /* ---------- results column ---------- */
+  .results-main{ min-width:0; }
+  .sort-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom: 16px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .result-count{ font-size: 13.5px; color: var(--muted); }
+  .sort-tabs{ display:flex; gap:6px; }
+  .sort-tab{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight:500;
+    color: var(--muted);
+  }
+  .sort-tab.active{
+    background: var(--ink);
+    border-color: var(--ink);
+    color:#F4F4F0;
+  }
+
+  .flight-card{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin-bottom: 14px;
+    display:grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 20px;
+    align-items:center;
+  }
+  .flight-card.best{ border-color: var(--brass); box-shadow: 0 0 0 1px var(--brass); }
+  .flight-airline{
+    display:flex; align-items:center; gap:10px;
+    font-size: 13px; color: var(--muted); margin-bottom:10px;
+  }
+  .flight-airline .dot{ width:7px; height:7px; border-radius:50%; background: var(--marine-2); }
+  .badge{
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--brass-dark);
+    background: #F3E8D3;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 4px;
+  }
+  .flight-times{
+    display:flex;
+    align-items:center;
+    gap: 18px;
+  }
+  .time-block{ text-align:center; }
+  .time-block .time{ font-size: 20px; font-weight:600; font-family:'Fraunces', serif; }
+  .time-block .code{ font-size:12px; color: var(--muted); }
+  .flight-path{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    min-width: 130px;
+  }
+  .flight-path .duration{ font-size:12px; color: var(--muted); }
+  .flight-path .line{
+    width:100%;
+    height:1px;
+    background: var(--line);
+    position:relative;
+  }
+  .flight-path .line::after{
+    content:"";
+    position:absolute;
+    right:0; top:50%;
+    width:6px; height:6px;
+    border-radius:50%;
+    background: var(--marine-2);
+    transform: translateY(-50%);
+  }
+  .flight-path .stops{ font-size:11.5px; color: var(--muted); }
+  .flight-path .stops.direct{ color: var(--good); }
+
+  .flight-price{ text-align:right; }
+  .flight-price .amount{
+    font-size: 22px;
+    font-weight:600;
+    font-family: 'Fraunces', serif;
+    display:block;
+  }
+  .flight-price .per{ font-size:11.5px; color: var(--muted); }
+  .select-btn{
+    margin-top: 10px;
+    border:none;
+    border-radius: var(--radius);
+    background: var(--brass);
+    color: var(--ink);
+    font-size: 13.5px;
+    font-weight:600;
+    padding: 10px 18px;
+  }
+  .select-btn:hover{ background: var(--brass-dark); color:#F4F4F0; }
+
+  @media (max-width: 700px){
+    .flight-card{ grid-template-columns: 1fr; text-align:left; }
+    .flight-price{ text-align:left; }
+    .flight-times{ flex-wrap:wrap; }
+  }
+
+  .load-more{
+    width:100%;
+    background:#fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px;
+    font-size: 14px;
+    font-weight:600;
+    color: var(--marine-2);
+    margin-top: 8px;
+  }
+  .load-more:hover{ border-color: var(--brass); }
+
+  .site-footer{
+    background: var(--ink);
+    color: #8FA0AA;
+    font-size: 12.5px;
+    padding: 22px 0;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; animation:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="wordmark" href="oceanic-booking.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#F4F4F0" stroke-width="1.6"><path d="M2 16l6-2 4-8 2 .6-2.4 7.4 5-1.3.6 1.9L11 17l-1.5 4-1.7-.5.7-4.3-4.8 1.3z"/></svg>
+      <span class="brand-word">Oceanic</span>
+    </a>
+    <nav class="site-nav">
+      <a href="oceanic-booking.html">Book</a>
+      <a href="#">Manage trip</a>
+      <a href="oceanic-checkin.html">Check in</a>
+      <a href="oceanic-help.html">Help</a>
+    </nav>
+  </div>
+</header>
+
+<div class="summary-bar">
+  <div class="wrap">
+    <div>
+      <div class="summary-route">
+        <span id="summaryFrom">Brisbane (BNE)</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+        <span id="summaryTo">Tokyo Narita (NRT)</span>
+      </div>
+      <div class="summary-details" id="summaryDetails">Fri 20 Sep – Fri 27 Sep · 1 adult · Economy</div>
+    </div>
+    <a href="oceanic-booking.html" class="edit-search">Edit search</a>
+  </div>
+</div>
+
+<div class="wrap results-layout">
+
+  <aside class="filters">
+    <h2>Filter results</h2>
+
+    <div class="filter-group">
+      <h3>Stops</h3>
+      <label class="filter-row"><input type="checkbox" checked><span>Direct</span><span class="count">6</span></label>
+      <label class="filter-row"><input type="checkbox" checked><span>1 stop</span><span class="count">9</span></label>
+      <label class="filter-row"><input type="checkbox"><span>2+ stops</span><span class="count">3</span></label>
+    </div>
+
+    <div class="filter-group">
+      <h3>Airline</h3>
+      <label class="filter-row"><input type="checkbox" checked><span>Oceanic Airways</span><span class="count">8</span></label>
+      <label class="filter-row"><input type="checkbox" checked><span>Pacific Blue</span><span class="count">5</span></label>
+      <label class="filter-row"><input type="checkbox" checked><span>Coral Air</span><span class="count">5</span></label>
+    </div>
+
+    <div class="filter-group">
+      <h3>Departure time</h3>
+      <label class="filter-row"><input type="checkbox" checked><span>Morning</span><span class="count">7</span></label>
+      <label class="filter-row"><input type="checkbox" checked><span>Afternoon</span><span class="count">6</span></label>
+      <label class="filter-row"><input type="checkbox" checked><span>Evening</span><span class="count">5</span></label>
+    </div>
+
+    <div class="filter-group">
+      <h3>Max price</h3>
+      <input type="range" min="600" max="1600" value="1600" class="price-slider" id="priceSlider">
+      <div class="price-value" id="priceValue">Up to $1,600</div>
+    </div>
+
+    <button type="button" class="clear-filters" id="clearFilters">Clear all filters</button>
+  </aside>
+
+  <main class="results-main">
+    <div class="sort-row">
+      <div class="result-count" id="resultCount">18 flights found</div>
+      <div class="sort-tabs">
+        <button type="button" class="sort-tab active" data-sort="best">Best</button>
+        <button type="button" class="sort-tab" data-sort="cheapest">Cheapest</button>
+        <button type="button" class="sort-tab" data-sort="fastest">Fastest</button>
+      </div>
+    </div>
+
+    <div id="flightList">
+
+      <article class="flight-card best" data-price="780" data-duration="580" data-flight="OA204">
+        <div>
+          <div class="flight-airline"><span class="dot"></span> Oceanic Airways · OA204 <span class="badge">Best value</span></div>
+          <div class="flight-times">
+            <div class="time-block"><div class="time">10:25</div><div class="code">BNE</div></div>
+            <div class="flight-path">
+              <div class="duration">9h 40m</div>
+              <div class="line"></div>
+              <div class="stops direct">Direct</div>
+            </div>
+            <div class="time-block"><div class="time">19:05</div><div class="code">NRT</div></div>
+          </div>
+        </div>
+        <div></div>
+        <div class="flight-price">
+          <span class="amount">$780</span>
+          <span class="per">per adult, return</span>
+          <button type="button" class="select-btn">Select</button>
+        </div>
+      </article>
+
+      <article class="flight-card" data-price="705" data-duration="640" data-flight="CA118">
+        <div>
+          <div class="flight-airline"><span class="dot"></span> Coral Air · CA118</div>
+          <div class="flight-times">
+            <div class="time-block"><div class="time">07:10</div><div class="code">BNE</div></div>
+            <div class="flight-path">
+              <div class="duration">10h 40m</div>
+              <div class="line"></div>
+              <div class="stops">1 stop · SIN</div>
+            </div>
+            <div class="time-block"><div class="time">17:50</div><div class="code">NRT</div></div>
+          </div>
+        </div>
+        <div></div>
+        <div class="flight-price">
+          <span class="amount">$705</span>
+          <span class="per">per adult, return</span>
+          <button type="button" class="select-btn">Select</button>
+        </div>
+      </article>
+
+      <article class="flight-card" data-price="915" data-duration="560" data-flight="PB552">
+        <div>
+          <div class="flight-airline"><span class="dot"></span> Pacific Blue · PB552</div>
+          <div class="flight-times">
+            <div class="time-block"><div class="time">14:05</div><div class="code">BNE</div></div>
+            <div class="flight-path">
+              <div class="duration">9h 20m</div>
+              <div class="line"></div>
+              <div class="stops direct">Direct</div>
+            </div>
+            <div class="time-block"><div class="time">22:25</div><div class="code">NRT</div></div>
+          </div>
+        </div>
+        <div></div>
+        <div class="flight-price">
+          <span class="amount">$915</span>
+          <span class="per">per adult, return</span>
+          <button type="button" class="select-btn">Select</button>
+        </div>
+      </article>
+
+      <article class="flight-card" data-price="640" data-duration="710" data-flight="OA771">
+        <div>
+          <div class="flight-airline"><span class="dot"></span> Oceanic Airways · OA771</div>
+          <div class="flight-times">
+            <div class="time-block"><div class="time">22:15</div><div class="code">BNE</div></div>
+            <div class="flight-path">
+              <div class="duration">11h 50m</div>
+              <div class="line"></div>
+              <div class="stops">1 stop · MNL</div>
+            </div>
+            <div class="time-block"><div class="time">11:05+1</div><div class="code">NRT</div></div>
+          </div>
+        </div>
+        <div></div>
+        <div class="flight-price">
+          <span class="amount">$640</span>
+          <span class="per">per adult, return</span>
+          <button type="button" class="select-btn">Select</button>
+        </div>
+      </article>
+
+      <article class="flight-card" data-price="1120" data-duration="540" data-flight="OA204">
+        <div>
+          <div class="flight-airline"><span class="dot"></span> Oceanic Airways · OA204 <span class="badge">Extra legroom</span></div>
+          <div class="flight-times">
+            <div class="time-block"><div class="time">10:25</div><div class="code">BNE</div></div>
+            <div class="flight-path">
+              <div class="duration">9h 00m</div>
+              <div class="line"></div>
+              <div class="stops direct">Direct</div>
+            </div>
+            <div class="time-block"><div class="time">18:25</div><div class="code">NRT</div></div>
+          </div>
+        </div>
+        <div></div>
+        <div class="flight-price">
+          <span class="amount">$1,120</span>
+          <span class="per">per adult, return</span>
+          <button type="button" class="select-btn">Select</button>
+        </div>
+      </article>
+
+    </div>
+
+    <button type="button" class="load-more">Show more flights</button>
+  </main>
+
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">Oceanic Airways is a fictional carrier — this page is a design sample.</div>
+</footer>
+
+<script>
+  // Pull search details from the previous page via URL params, with sensible fallbacks
+  const params = new URLSearchParams(window.location.search);
+  const from = params.get('from') || 'Brisbane (BNE)';
+  const to = params.get('to') || 'Tokyo Narita (NRT)';
+  const pax = params.get('pax') || '1 adult';
+  const cabin = params.get('cabin') || 'Economy';
+  const depart = params.get('depart');
+  const ret = params.get('return');
+
+  document.getElementById('summaryFrom').textContent = from;
+  document.getElementById('summaryTo').textContent = to;
+  document.getElementById('summaryDetails').textContent =
+    (depart ? `${depart}${ret ? ' – ' + ret : ''} · ` : '') + `${pax} · ${cabin}`;
+
+  // Sort tabs
+  const sortTabs = document.querySelectorAll('.sort-tab');
+  const flightList = document.getElementById('flightList');
+  sortTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      sortTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const cards = Array.from(flightList.children);
+      const sortKey = tab.dataset.sort;
+      cards.sort((a, b) => {
+        if (sortKey === 'cheapest') return a.dataset.price - b.dataset.price;
+        if (sortKey === 'fastest') return a.dataset.duration - b.dataset.duration;
+        return 0; // "best" keeps the original curated order
+      });
+      cards.forEach(card => flightList.appendChild(card));
+    });
+  });
+
+  // Price slider
+  const slider = document.getElementById('priceSlider');
+  const priceValue = document.getElementById('priceValue');
+  slider.addEventListener('input', () => {
+    priceValue.textContent = `Up to $${Number(slider.value).toLocaleString()}`;
+    document.querySelectorAll('.flight-card').forEach(card => {
+      card.style.display = Number(card.dataset.price) <= Number(slider.value) ? '' : 'none';
+    });
+  });
+
+  // Clear filters
+  document.getElementById('clearFilters').addEventListener('click', () => {
+    document.querySelectorAll('.filter-row input[type="checkbox"]').forEach(cb => cb.checked = true);
+    slider.value = 1600;
+    priceValue.textContent = 'Up to $1,600';
+    document.querySelectorAll('.flight-card').forEach(card => card.style.display = '');
+  });
+
+  // Select flight — carry it straight into the seats & baggage page
+  document.querySelectorAll('.select-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.flight-card');
+      const bagParams = new URLSearchParams({
+        from: from,
+        to: to,
+        pax: pax,
+        cabin: cabin,
+        flight: card.dataset.flight,
+        fare: card.dataset.price
+      });
+      window.location.href = `oceanic-baggage.html?${bagParams.toString()}`;
+    });
+  });
+
+  // "Show more" just reveals a note — no real pagination in this demo
+  document.querySelector('.load-more').addEventListener('click', function(){
+    this.textContent = 'No more flights match this search';
+    this.disabled = true;
+    this.style.opacity = '0.6';
+  });
+</script>
+
+</body>
+</html>
