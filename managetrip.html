@@ -1,1 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oceanic Airways — Your booking</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,ital@9..144,300,1;9..144,600,0;9..144,600,1&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
 
+  :root{
+    --ink:        #0D2436;
+    --marine:     #163A52;
+    --marine-2:   #1E4A66;
+    --foam:       #EDEFEA;
+    --card:       #FBFAF7;
+    --brass:      #C0873E;
+    --brass-dark: #9C6C2B;
+    --text:       #12222B;
+    --muted:      #5E7481;
+    --line:       #D8DCD3;
+    --good:       #3E7A5C;
+    --danger:     #A5432E;
+    --radius:     4px;
+  }
+
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    background: var(--foam);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, .brand-word{ font-family:'Fraunces', Georgia, serif; }
+  .wrap{ max-width: 1120px; margin: 0 auto; padding-left: 28px; padding-right: 28px; }
+  a{ color:inherit; }
+  button{ font-family: inherit; cursor:pointer; }
+
+  /* ---------- header ---------- */
+  .site-header{ background: var(--ink); color:#F4F4F0; }
+  .site-header .wrap{ display:flex; align-items:center; justify-content:space-between; height:68px; }
+  .wordmark{ display:flex; align-items:center; gap:10px; text-decoration:none; color:#F4F4F0; }
+  .wordmark svg{ width:22px; height:22px; }
+  .brand-word{ font-size:20px; font-weight:600; letter-spacing:0.02em; }
+  .site-nav{ display:flex; gap:28px; font-size:14px; }
+  .site-nav a{ text-decoration:none; color:#C9D2D6; padding-bottom:3px; border-bottom:1px solid transparent; transition: color .15s ease, border-color .15s ease; }
+  .site-nav a:hover{ color:#F4F4F0; border-color: var(--brass); }
+  .site-nav a.current{ color:#F4F4F0; border-color: var(--brass); }
+  @media (max-width:640px){ .site-nav{ display:none; } }
+
+  /* ---------- summary bar ---------- */
+  .summary-bar{ background: var(--marine); color:#F4F4F0; }
+  .summary-bar .wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:12px; padding: 18px 28px;
+  }
+  .summary-route{ display:flex; align-items:center; gap:10px; font-size:17px; font-weight:600; }
+  .summary-route svg{ width:16px; height:16px; stroke:#C9D2D6; }
+  .summary-details{ font-size:13px; color:#B9CAD1; margin-top:2px; }
+  .summary-right{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+  .back-link{
+    font-size:13px; font-weight:600; color:#F4F4F0; text-decoration:none;
+    border-bottom:1px solid var(--brass); padding-bottom:2px; white-space:nowrap;
+  }
+  .status-pill{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12.5px; font-weight:600;
+    color: var(--good);
+    background:#E5F0E9;
+    border-radius: 20px;
+    padding: 6px 12px;
+  }
+  .status-pill .dot{ width:7px; height:7px; border-radius:50%; background: var(--good); }
+  .status-pill.cancelled{ color: var(--danger); background:#FBEAE5; }
+  .status-pill.cancelled .dot{ background: var(--danger); }
+
+  /* ---------- layout ---------- */
+  .trip-layout{
+    display:grid;
+    grid-template-columns: 1fr 300px;
+    gap: 22px;
+    align-items:start;
+    padding: 28px 0 60px;
+  }
+  @media (max-width: 900px){ .trip-layout{ grid-template-columns: 1fr; } }
+
+  .panel{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 18px;
+  }
+  .panel h3{ font-size:16px; font-weight:600; margin: 0 0 16px; }
+
+  .leg{
+    display:grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    align-items:center;
+    padding-bottom: 18px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .leg:last-child{ padding-bottom:0; margin-bottom:0; border-bottom:none; }
+  .leg-label{ font-size:11.5px; font-weight:600; color: var(--brass-dark); margin-bottom:8px; }
+  .leg-times{ display:flex; align-items:center; gap:18px; }
+  .time-block{ text-align:center; }
+  .time-block .time{ font-size:20px; font-weight:600; font-family:'Fraunces', serif; }
+  .time-block .code{ font-size:12px; color: var(--muted); }
+  .leg-path{ display:flex; flex-direction:column; align-items:center; gap:2px; min-width:110px; }
+  .leg-path .duration{ font-size:12px; color: var(--muted); }
+  .leg-path .line{ width:100%; height:1px; background: var(--line); position:relative; }
+  .leg-path .line::after{
+    content:""; position:absolute; right:0; top:50%;
+    width:6px; height:6px; border-radius:50%; background: var(--marine-2);
+    transform: translateY(-50%);
+  }
+  .leg-path .stops{ font-size:11.5px; color: var(--good); }
+  .leg-meta{ text-align:right; font-size:12.5px; color: var(--muted); line-height:1.6; }
+  .leg-meta strong{ color: var(--text); font-weight:600; }
+  @media (max-width: 640px){
+    .leg{ grid-template-columns: 1fr; }
+    .leg-meta{ text-align:left; }
+    .leg-times{ flex-wrap:wrap; }
+  }
+
+  .detail-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .detail label{ display:block; font-size:11px; color: var(--muted); margin-bottom:4px; }
+  .detail .val{ font-size:14.5px; font-weight:600; }
+  @media (max-width: 640px){ .detail-grid{ grid-template-columns: repeat(2, 1fr); } }
+
+  /* ---------- action sidebar ---------- */
+  .actions-panel{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px;
+    position: sticky;
+    top: 20px;
+  }
+  .actions-panel h3{ font-size:16px; font-weight:600; margin:0 0 14px; }
+  .action-btn{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-size:13.5px;
+    font-weight:500;
+    color: var(--text);
+    margin-bottom:10px;
+    text-align:left;
+    text-decoration:none;
+    transition: border-color .15s ease;
+  }
+  .action-btn:hover{ border-color: var(--brass); }
+  .action-btn svg{ width:15px; height:15px; stroke: var(--marine-2); flex-shrink:0; }
+  .action-btn.danger{ color: var(--danger); }
+  .action-btn.danger svg{ stroke: var(--danger); }
+  .action-btn.danger:hover{ border-color: var(--danger); }
+  .actions-note{ font-size:11.5px; color: var(--muted); margin:6px 0 0; line-height:1.5; }
+
+  /* ---------- not found ---------- */
+  .not-found{
+    display:none;
+    max-width: 520px;
+    margin: 64px auto;
+    text-align:center;
+    padding: 0 28px;
+  }
+  .not-found.show{ display:block; }
+  .not-found h2{ font-size:26px; margin:0 0 10px; }
+  .not-found p{ font-size:14px; color: var(--muted); line-height:1.6; margin:0 0 22px; }
+  .not-found a{
+    display:inline-block;
+    background: var(--brass); color: var(--ink);
+    text-decoration:none; font-weight:600; font-size:14px;
+    padding: 12px 22px; border-radius: var(--radius);
+  }
+
+  /* ---------- confirm modal ---------- */
+  .modal-backdrop{
+    position:fixed; inset:0;
+    background: rgba(13,36,54,.55);
+    display:none;
+    align-items:center; justify-content:center;
+    padding: 20px;
+    z-index: 50;
+  }
+  .modal-backdrop.show{ display:flex; }
+  .modal{
+    background: var(--card);
+    border-radius: var(--radius);
+    max-width: 420px;
+    width:100%;
+    padding: 26px;
+    box-shadow: 0 30px 60px -20px rgba(13,36,54,.6);
+  }
+  .modal h3{ font-family:'Fraunces', serif; font-size:20px; margin:0 0 10px; }
+  .modal p{ font-size:13.5px; color: var(--muted); line-height:1.6; margin:0 0 22px; }
+  .modal-actions{ display:flex; gap:10px; justify-content:flex-end; }
+  .modal-btn{ border:none; border-radius: var(--radius); padding: 10px 18px; font-size:13.5px; font-weight:600; }
+  .modal-btn.secondary{ background:#fff; border:1px solid var(--line); color: var(--marine-2); }
+  .modal-btn.secondary:hover{ border-color: var(--brass); }
+  .modal-btn.danger{ background: var(--danger); color:#fff; }
+  .modal-btn.danger:hover{ background:#8A3523; }
+
+  .site-footer{ background: var(--ink); color:#8FA0AA; font-size:12.5px; padding:22px 0; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="wordmark" href="oceanic-booking.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#F4F4F0" stroke-width="1.6"><path d="M2 16l6-2 4-8 2 .6-2.4 7.4 5-1.3.6 1.9L11 17l-1.5 4-1.7-.5.7-4.3-4.8 1.3z"/></svg>
+      <span class="brand-word">Oceanic</span>
+    </a>
+    <nav class="site-nav">
+      <a href="oceanic-booking.html">Book</a>
+      <a href="oceanic-manage.html" class="current">Manage trip</a>
+      <a href="oceanic-checkin.html">Check in</a>
+      <a href="oceanic-help.html">Help</a>
+    </nav>
+  </div>
+</header>
+
+<div id="tripContent">
+
+  <div class="summary-bar">
+    <div class="wrap">
+      <div>
+        <div class="summary-route">
+          <span>Brisbane (BNE)</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          <span>Tokyo Narita (NRT)</span>
+        </div>
+        <div class="summary-details" id="tripRef">Booking reference 7QK4XM</div>
+      </div>
+      <div class="summary-right">
+        <span class="status-pill" id="statusPill"><span class="dot"></span><span id="statusText">Confirmed</span></span>
+        <a href="oceanic-manage.html" class="back-link">Look up another booking</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap trip-layout">
+    <div>
+      <div class="panel">
+        <h3>Itinerary</h3>
+
+        <div class="leg">
+          <div>
+            <div class="leg-label">OUTBOUND · FRI 20 SEP</div>
+            <div class="leg-times">
+              <div class="time-block"><div class="time">10:25</div><div class="code">BNE</div></div>
+              <div class="leg-path">
+                <div class="duration">9h 40m</div>
+                <div class="line"></div>
+                <div class="stops">Direct</div>
+              </div>
+              <div class="time-block"><div class="time">19:05</div><div class="code">NRT</div></div>
+            </div>
+          </div>
+          <div class="leg-meta"><strong>OA204</strong><br>Economy</div>
+        </div>
+
+        <div class="leg">
+          <div>
+            <div class="leg-label">RETURN · FRI 27 SEP</div>
+            <div class="leg-times">
+              <div class="time-block"><div class="time">11:30</div><div class="code">NRT</div></div>
+              <div class="leg-path">
+                <div class="duration">9h 05m</div>
+                <div class="line"></div>
+                <div class="stops">Direct</div>
+              </div>
+              <div class="time-block"><div class="time">20:35</div><div class="code">BNE</div></div>
+            </div>
+          </div>
+          <div class="leg-meta"><strong>OA205</strong><br>Economy</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Passenger &amp; extras</h3>
+        <div class="detail-grid">
+          <div class="detail"><label>Passenger</label><div class="val" id="paxName">Nguyen / T.</div></div>
+          <div class="detail"><label>Seat (outbound)</label><div class="val">14C</div></div>
+          <div class="detail"><label>Seat (return)</label><div class="val">16A</div></div>
+          <div class="detail"><label>Checked bags</label><div class="val">1 included</div></div>
+          <div class="detail"><label>Meal</label><div class="val">Standard</div></div>
+          <div class="detail"><label>Total paid</label><div class="val">$780</div></div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="actions-panel">
+      <h3>Make a change</h3>
+
+      <a class="action-btn" href="oceanic-results.html?from=Brisbane%20(BNE)&to=Tokyo%20Narita%20(NRT)">
+        Change flight
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+      <a class="action-btn" href="oceanic-baggage.html?from=Brisbane%20(BNE)&to=Tokyo%20Narita%20(NRT)&flight=OA204&fare=780">
+        Change seat or add bags
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+      <a class="action-btn" href="oceanic-checkin.html">
+        Check in online
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+      <button type="button" class="action-btn" id="downloadBtn">
+        Download itinerary
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+      </button>
+      <button type="button" class="action-btn danger" id="cancelBtn">
+        Cancel trip
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <p class="actions-note">Free date changes are available up to 24 hours before departure.</p>
+    </aside>
+  </div>
+
+</div>
+
+<section class="not-found" id="notFound">
+  <h2>We couldn't find that booking</h2>
+  <p>The booking reference or last name didn't match our records. Head back and try looking it up again.</p>
+  <a href="oceanic-manage.html">Back to Manage trip</a>
+</section>
+
+<div class="modal-backdrop" id="cancelModal" role="dialog" aria-modal="true" aria-labelledby="cancelTitle">
+  <div class="modal">
+    <h3 id="cancelTitle">Cancel this trip?</h3>
+    <p>Your booking will be cancelled and your fare converted according to its fare conditions. This can't be undone.</p>
+    <div class="modal-actions">
+      <button type="button" class="modal-btn secondary" id="keepTripBtn">Keep trip</button>
+      <button type="button" class="modal-btn danger" id="confirmCancelBtn">Yes, cancel</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap">Oceanic Airways is a fictional carrier — this page is a design sample.</div>
+</footer>
+
+<script>
+  // Read the lookup details passed in from the Manage trip page
+  const params = new URLSearchParams(window.location.search);
+  const pnr = (params.get('pnr') || '7QK4XM').toUpperCase();
+  const name = params.get('name') || 'Nguyen';
+
+  // Demo "database": only this reference works
+  const validPnr = '7QK4XM';
+
+  if (pnr !== validPnr) {
+    document.getElementById('tripContent').style.display = 'none';
+    document.getElementById('notFound').classList.add('show');
+  } else {
+    document.getElementById('tripRef').textContent = `Booking reference ${pnr}`;
+    document.getElementById('paxName').textContent =
+      `${name.toUpperCase()} / ${name.charAt(0).toUpperCase()}.`;
+  }
+
+  // Cancel flow with a confirmation modal
+  const modal = document.getElementById('cancelModal');
+  document.getElementById('cancelBtn').addEventListener('click', () => modal.classList.add('show'));
+  document.getElementById('keepTripBtn').addEventListener('click', () => modal.classList.remove('show'));
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('show'); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') modal.classList.remove('show'); });
+
+  document.getElementById('confirmCancelBtn').addEventListener('click', () => {
+    modal.classList.remove('show');
+    document.getElementById('statusPill').classList.add('cancelled');
+    document.getElementById('statusText').textContent = 'Cancelled';
+    document.querySelectorAll('.actions-panel .action-btn').forEach(el => {
+      el.style.pointerEvents = 'none';
+      el.style.opacity = '.5';
+    });
+  });
+
+  // Download — demo only
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    alert('This is a design sample — there\'s no real itinerary file to download yet.');
+  });
+</script>
+
+</body>
+</html>
