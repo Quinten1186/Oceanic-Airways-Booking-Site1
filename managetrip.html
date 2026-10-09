@@ -395,3 +395,74 @@
 
 </body>
 </html>
+<script>
+  // Small confirmation message that fades out on its own
+  function showToast(message) {
+    const old = document.getElementById('toast');
+    if (old) old.remove();
+    const t = document.createElement('div');
+    t.id = 'toast';
+    t.setAttribute('role', 'status');
+    t.textContent = message;
+    t.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:#0D2436;color:#F4F4F0;font:500 13.5px "IBM Plex Sans",system-ui,sans-serif;padding:12px 20px;border-radius:4px;box-shadow:0 18px 36px -16px rgba(13,36,54,.6);z-index:60;';
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+  }
+
+  // Download itinerary: saves a real .txt file instead of showing the placeholder alert
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('#downloadBtn');
+    if (!btn) return;
+    e.stopPropagation(); // stops the old alert handler from running
+
+    const ref = document.getElementById('tripRef').textContent.replace('Booking reference', '').trim();
+    const passenger = document.getElementById('paxName').textContent.trim();
+    const status = document.getElementById('statusText').textContent.trim();
+
+    const lines = [
+      'OCEANIC AIRWAYS - ITINERARY',
+      '===========================',
+      'Booking reference: ' + ref,
+      'Status: ' + status,
+      'Passenger: ' + passenger,
+      '',
+      'OUTBOUND - Fri 20 Sep',
+      '  OA204  Brisbane (BNE) 10:25 -> Tokyo Narita (NRT) 19:05',
+      '  9h 40m, direct, Economy, seat 14C',
+      '',
+      'RETURN - Fri 27 Sep',
+      '  OA205  Tokyo Narita (NRT) 11:30 -> Brisbane (BNE) 20:35',
+      '  9h 05m, direct, Economy, seat 16A',
+      '',
+      'Checked bags: 1 included',
+      'Meal: Standard',
+      'Total paid: $780',
+      '',
+      'Oceanic Airways is a fictional carrier - this is a design sample.'
+    ];
+
+    const blob = new Blob([lines.join('\r\n')], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'oceanic-itinerary-' + ref + '.txt';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    showToast('Itinerary downloaded');
+  }, true);
+
+  // Cancel trip: the modal already works, this adds a confirmation message after "Yes, cancel"
+  document.getElementById('confirmCancelBtn').addEventListener('click', () => {
+    showToast('Your trip has been cancelled.');
+  });
+
+  // Change flight / Change seat or add bags: pass passengers and cabin along too
+  document.querySelectorAll('.actions-panel a.action-btn').forEach((a) => {
+    const href = a.getAttribute('href');
+    if (href.indexOf('oceanic-results.html') === 0 || href.indexOf('oceanic-baggage.html') === 0) {
+      a.setAttribute('href', href + '&pax=' + encodeURIComponent('1 adult') + '&cabin=Economy');
+    }
+  });
+</script>
