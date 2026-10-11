@@ -1,1 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oceanic Airways — Fly the Pacific and beyond</title>
+<link rel="stylesheet" href="oceanic.css">
+<style>
+  /* ---------- homepage-only styles ---------- */
+  .hero{padding:72px 0 176px}
+  .overlap{margin-top:-124px;padding-bottom:64px}
+  .waves{position:absolute;left:0;right:0;bottom:0;height:150px;pointer-events:none}
+  .waves svg{width:100%;height:100%;display:block}
+  .hero-inner{max-width:640px}
+  .eyebrow{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--brass);margin-bottom:14px}
+  .hero h1{font-size:clamp(36px,5.6vw,58px);line-height:1.06;letter-spacing:-.015em;margin:0 0 18px}
+  .hero h1 .accent{color:#E2B574}
+  .hero p{font-size:16.5px;line-height:1.6;max-width:48ch}
+  .hero-stats{display:flex;gap:34px;margin-top:34px;flex-wrap:wrap}
+  .hero-stats div{display:flex;flex-direction:column}
+  .hero-stats b{font:600 28px 'Fraunces',serif;color:#F4F4F0;line-height:1}
+  .hero-stats span{font-size:12.5px;color:#9FB4BE;margin-top:6px}
+
+  /* search card */
+  #searchForm{overflow:visible}
+  .tabs{display:flex;background:var(--ink);border-radius:var(--radius) var(--radius) 0 0}
+  .tab{appearance:none;border:0;border-bottom:2px solid transparent;background:transparent;color:#93A5AE;font-weight:500;padding:16px 24px;transition:color .15s,border-color .15s}
+  .tab:first-child{border-top-left-radius:var(--radius)}
+  .tab.active{color:#F4F4F0;border-bottom-color:var(--brass)}
+  .route-row{display:grid;grid-template-columns:1fr 44px 1fr;align-items:end;gap:12px}
+  .swap{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:2px;transition:transform .3s,border-color .15s}
+  .swap:hover{border-color:var(--brass)}
+  .swap.spun{transform:rotate(180deg)}
+  .swap svg{width:18px;height:18px;stroke:var(--marine-2)}
+  @media(max-width:640px){.route-row{grid-template-columns:1fr}.swap{justify-self:start;margin:4px 0}}
+  .return-field.off{visibility:hidden}
+  .perf{margin-left:-32px;margin-right:-32px}
+  @media(max-width:640px){.perf{margin-left:-20px;margin-right:-20px}}
+
+  /* airport dropdown */
+  .combo{position:relative}
+  .combo-box{position:relative}
+  .combo-box input{padding-right:40px;text-overflow:ellipsis;cursor:pointer}
+  .combo-box input:focus{cursor:text}
+  .combo-toggle{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:32px;height:32px;border:0;background:transparent;display:flex;align-items:center;justify-content:center;border-radius:3px}
+  .combo-toggle svg{width:14px;height:14px;stroke:var(--muted);transition:transform .15s}
+  .combo.open .combo-toggle svg{transform:rotate(180deg)}
+  .combo-panel{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 24px 48px -16px rgba(13,36,54,.45);max-height:320px;overflow:auto;overscroll-behavior:contain}
+  .combo-panel[hidden]{display:none}
+  .combo-group{position:sticky;top:0;background:#F6F4EC;color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:8px 14px;border-bottom:1px solid var(--line)}
+  .combo-opt{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;font-size:14.5px}
+  .combo-opt b{font-size:12px;font-weight:600;letter-spacing:.05em;color:var(--muted)}
+  .combo-opt.active{background:#F3E8D3}
+  .combo-opt.sel{font-weight:600}
+  .combo-opt.sel b{color:var(--brass-dark)}
+  .combo-empty{padding:18px 14px;font-size:13.5px;color:var(--muted)}
+  @media(max-width:640px){.combo-panel{max-height:260px}}
+
+  /* sections */
+  .section{padding:8px 0 56px}
+  .section-head{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:24px}
+  .section-head .eyebrow{margin-bottom:8px;color:var(--brass-dark)}
+  .section-head h2{font-size:clamp(24px,3vw,32px);line-height:1.15}
+  .section-head p{margin:6px 0 0;font-size:14px;color:var(--muted)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:20px;padding:8px 16px;font-size:13px;font-weight:500;color:var(--muted);transition:border-color .15s,background .15s,color .15s}
+  .chip:hover{border-color:var(--brass)}
+  .chip.active{background:var(--ink);border-color:var(--ink);color:#F4F4F0}
+
+  /* destination cards */
+  .dest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media(max-width:900px){.dest-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.dest-grid{grid-template-columns:1fr}}
+  .dest{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;text-decoration:none;color:inherit;transition:transform .18s,box-shadow .18s,border-color .18s}
+  .dest:hover{transform:translateY(-4px);border-color:var(--brass);box-shadow:0 22px 40px -22px rgba(13,36,54,.5)}
+  .dest-top{position:relative;height:132px;padding:14px 16px;color:#F4F4F0;background:radial-gradient(circle at 82% 18%,rgba(226,181,116,.38),transparent 45%),var(--g)}
+  .dest-top .reg{position:relative;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#C9D8DE}
+  .dest-top svg{position:absolute;left:0;bottom:0;width:100%;height:84px}
+  .dest-top svg path{fill:none;stroke:rgba(255,255,255,.35);stroke-width:1.3;stroke-dasharray:3 5}
+  .dest-top svg circle{fill:#E2B574}
+  .dest-top .code{position:absolute;right:16px;bottom:10px;font:600 40px 'Fraunces',serif;letter-spacing:.02em;color:rgba(255,255,255,.92)}
+  .dest-body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:6px;flex:1}
+  .dest-body h3{font:600 20px 'Fraunces',serif}
+  .dest-body .meta{font-size:12.5px;color:var(--muted)}
+  .dest-body .foot{display:flex;justify-content:space-between;align-items:baseline;margin-top:auto;padding-top:14px}
+  .dest-body .price{font-size:13px;color:var(--muted)}
+  .dest-body .price strong{font:600 22px 'Fraunces',serif;color:var(--text)}
+  .dest-body .go{font-size:13px;font-weight:600;color:var(--brass-dark)}
+
+  /* promo band */
+  .promo{display:flex;align-items:center;justify-content:space-between;gap:28px;flex-wrap:wrap;background:linear-gradient(120deg,var(--ink),var(--marine-2));color:#F4F4F0;border-radius:var(--radius);padding:38px 40px;position:relative;overflow:hidden}
+  .promo::after{content:"";position:absolute;right:-60px;top:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(226,181,116,.35),transparent 65%);pointer-events:none}
+  .promo h2{font-size:clamp(22px,2.8vw,30px);max-width:24ch;line-height:1.2;margin:0 0 10px}
+  .promo p{margin:0;color:#B9CAD1;font-size:14.5px;max-width:48ch}
+  .promo .btn{position:relative;z-index:1}
+  @media(max-width:640px){.promo{padding:28px 24px}}
+
+  /* quick links */
+  .quick{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:760px){.quick{grid-template-columns:1fr}}
+  .qcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column;gap:10px;text-decoration:none;transition:transform .18s,border-color .18s,box-shadow .18s}
+  .qcard:hover{transform:translateY(-3px);border-color:var(--brass);box-shadow:0 18px 34px -22px rgba(13,36,54,.5)}
+  .qcard .ic{width:44px;height:44px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;margin-bottom:6px}
+  .qcard .ic svg{width:21px;height:21px;stroke:#E2B574}
+  .qcard h3{font:600 18px 'Fraunces',serif}
+  .qcard p{margin:0;font-size:13.5px;color:var(--muted);flex:1}
+  .qcard span{font-size:13px;font-weight:600;color:var(--brass-dark)}
+
+  /* fares */
+  .fares{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:860px){.fares{grid-template-columns:1fr}}
+  .fare{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px;position:relative}
+  .fare.best{border-color:var(--brass);box-shadow:0 0 0 1px var(--brass),0 22px 40px -26px rgba(192,135,62,.6)}
+  .fare .badge{position:absolute;top:-11px;left:22px;background:var(--brass);color:var(--ink);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:12px}
+  .fare h3{font:600 21px 'Fraunces',serif;margin-bottom:2px}
+  .fare .tag{font-size:12.5px;color:var(--muted);margin-bottom:14px;display:block}
+  .fare ul{list-style:none;margin:0;padding:0;font-size:13.5px}
+  .fare li{padding:9px 0 9px 24px;position:relative;border-top:1px solid var(--line);color:var(--text)}
+  .fare li::before{content:"";position:absolute;left:2px;top:15px;width:10px;height:5px;border-left:2px solid var(--good);border-bottom:2px solid var(--good);transform:rotate(-45deg)}
+</style>
+</head>
+<body data-page="home">
+
+<section class="hero" data-arc>
+  <div class="waves" aria-hidden="true">
+    <svg viewBox="0 0 1440 150" preserveAspectRatio="none">
+      <path d="M0 70 C 240 20 480 120 760 70 S 1240 20 1440 80 L1440 150 L0 150Z" fill="rgba(255,255,255,.045)"/>
+      <path d="M0 100 C 280 60 520 140 820 100 S 1280 70 1440 110 L1440 150 L0 150Z" fill="rgba(255,255,255,.06)"/>
+    </svg>
+  </div>
+  <div class="wrap hero-inner">
+    <span class="eyebrow">Oceanic Airways</span>
+    <h1>Every horizon has a <span class="accent">gate number.</span></h1>
+    <p>Search Oceanic's network across the Pacific and Indian Ocean, and hold your seat in minutes.</p>
+    <div class="hero-stats">
+      <div><b>64</b><span>airports</span></div>
+      <div><b>6</b><span>continents</span></div>
+      <div><b>23kg</b><span>bag included</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap overlap">
+  <form class="card" id="searchForm" novalidate>
+    <div class="tabs" role="tablist">
+      <button type="button" class="tab active" role="tab" aria-selected="true" data-trip="round">Round trip</button>
+      <button type="button" class="tab" role="tab" aria-selected="false" data-trip="oneway">One way</button>
+    </div>
+    <div class="card-body">
+      <div class="route-row">
+        <div class="field combo" id="fromCombo">
+          <label for="fromInput">From</label>
+          <div class="combo-box">
+            <input id="fromInput" role="combobox" aria-expanded="false" aria-controls="fromList" aria-autocomplete="list" autocomplete="off" placeholder="Choose an airport">
+            <button type="button" class="combo-toggle" tabindex="-1" aria-label="Show departure airports"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+          </div>
+          <div class="combo-panel" id="fromList" role="listbox" aria-label="Departure airports" hidden></div>
+        </div>
+
+        <button type="button" class="swap" id="swapBtn" aria-label="Swap origin and destination">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>
+        </button>
+
+        <div class="field combo" id="toCombo">
+          <label for="toInput">To</label>
+          <div class="combo-box">
+            <input id="toInput" role="combobox" aria-expanded="false" aria-controls="toList" aria-autocomplete="list" autocomplete="off" placeholder="Choose an airport">
+            <button type="button" class="combo-toggle" tabindex="-1" aria-label="Show destination airports"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+          </div>
+          <div class="combo-panel" id="toList" role="listbox" aria-label="Destination airports" hidden></div>
+        </div>
+      </div>
+
+      <div class="perf" aria-hidden="true"></div>
+
+      <div class="grid2">
+        <div class="field">
+          <label for="departDate">Depart</label>
+          <input type="date" id="departDate">
+        </div>
+        <div class="field return-field" id="returnField">
+          <label for="returnDate">Return</label>
+          <input type="date" id="returnDate">
+        </div>
+      </div>
+
+      <div class="grid2" style="margin-bottom:24px">
+        <div class="field">
+          <label id="paxLabel">Passengers</label>
+          <div class="stepper" role="group" aria-labelledby="paxLabel">
+            <button type="button" id="paxMinus" aria-label="Fewer passengers">–</button>
+            <span id="paxCount" aria-live="polite">1 adult</span>
+            <button type="button" id="paxPlus" aria-label="More passengers">+</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="cabinSelect">Cabin</label>
+          <select id="cabinSelect">
+            <option>Economy</option>
+            <option>Premium Economy</option>
+            <option>Business</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">
+        Search flights
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </button>
+      <div class="alert error" id="searchError" role="alert"></div>
+    </div>
+  </form>
+</div>
+
+<section class="wrap section" id="destinations">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Popular right now</span>
+      <h2 id="destTitle">Popular from Brisbane</h2>
+      <p>Cheapest return fares for a two-week lead time.</p>
+    </div>
+    <div class="chips" id="originChips" role="group" aria-label="Departure city">
+      <button type="button" class="chip active" data-origin="BNE">Brisbane</button>
+      <button type="button" class="chip" data-origin="SYD">Sydney</button>
+      <button type="button" class="chip" data-origin="MEL">Melbourne</button>
+      <button type="button" class="chip" data-origin="PER">Perth</button>
+    </div>
+  </div>
+  <div class="dest-grid" id="destGrid"></div>
+</section>
+
+<section class="wrap section">
+  <div class="promo">
+    <div style="position:relative;z-index:1">
+      <span class="eyebrow">Premium Economy</span>
+      <h2>Two bags and extra legroom, without the Business price.</h2>
+      <p>More space to stretch out on the long Pacific crossings, with priority check-in and boarding included.</p>
+    </div>
+    <button type="button" class="btn btn-primary" id="promoBtn">Search Premium Economy</button>
+  </div>
+</section>
+
+<section class="wrap section">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">After you book</span>
+      <h2>Everything in one place</h2>
+      <p>Change, check in, or get answers whenever you need them.</p>
+    </div>
+  </div>
+  <div class="quick">
+    <a class="qcard" href="oceanic-manage.html">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg></div>
+      <h3>Manage trip</h3>
+      <p>Change flights, update seats and bags, or cancel a booking.</p>
+      <span>Find my booking →</span>
+    </a>
+    <a class="qcard" href="oceanic-checkin.html">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+      <h3>Check in</h3>
+      <p>Opens 48 hours before departure. Get your boarding pass in under a minute.</p>
+      <span>Check in online →</span>
+    </a>
+    <a class="qcard" href="oceanic-help.html">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-.9.6-1.5 1.1-1.5 2.2M12 17h.01"/></svg></div>
+      <h3>Help centre</h3>
+      <p>Baggage, refunds, travel documents and live chat with our team.</p>
+      <span>Get help →</span>
+    </a>
+  </div>
+</section>
+
+<section class="wrap section">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">Fares</span>
+      <h2>Three cabins, no surprises</h2>
+      <p>Compare what's included before you book.</p>
+    </div>
+  </div>
+  <div class="fares">
+    <div class="fare">
+      <h3>Economy</h3>
+      <span class="tag">The everyday fare</span>
+      <ul><li>1 checked bag (23kg) included</li><li>Free date changes up to 24 hours before departure</li><li>Seat selection from $0</li></ul>
+    </div>
+    <div class="fare best">
+      <span class="badge">Most popular</span>
+      <h3>Premium Economy</h3>
+      <span class="tag">Room to stretch out</span>
+      <ul><li>2 checked bags included</li><li>Extra legroom and wider seats</li><li>Priority check-in and boarding</li></ul>
+    </div>
+    <div class="fare">
+      <h3>Business</h3>
+      <span class="tag">Lie-flat comfort</span>
+      <ul><li>3 checked bags included</li><li>Lounge access before every flight</li><li>Fully flexible, refundable fare</li></ul>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="info">
+    <div>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h16v11a1 1 0 01-1 1H5a1 1 0 01-1-1V8zM9 8V6a3 3 0 016 0v2"/></svg>
+      <div><h3>Checked bag included</h3><p>One 23kg bag comes standard on every Economy fare across the network.</p></div>
+    </div>
+    <div>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18M7 3v4M17 3v4M5 6h14a2 2 0 012 2v11a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z"/></svg>
+      <div><h3>Free date changes</h3><p>Move your flight up to 24 hours before departure, no change fee.</p></div>
+    </div>
+    <div>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg>
+      <div><h3>64 airports, 6 continents</h3><p>From Brisbane to Buenos Aires, one booking and one set of rules.</p></div>
+    </div>
+  </div>
+</div>
+
+<script src="oceanic.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  const D = OA.defaults();
+  let trip = 'round', pax = 1;
+
+  /* ---------- airports grouped by region for the dropdowns ---------- */
+  const GROUPS = [
+    ['Australia', 'BNE SYD MEL PER ADL CNS OOL CBR DRW HBA'],
+    ['New Zealand & Pacific', 'AKL CHC WLG NAN POM NOU PPT APW HNL'],
+    ['East Asia', 'NRT HND KIX ICN PEK PVG HKG TPE MNL'],
+    ['Southeast Asia', 'SIN KUL BKK DPS CGK SGN HAN'],
+    ['South Asia & Indian Ocean', 'DEL BOM CMB MLE'],
+    ['Middle East & Turkey', 'DXB DOH AUH IST'],
+    ['Europe', 'LHR CDG FRA AMS FCO MAD ZRH'],
+    ['North America', 'LAX SFO SEA DFW ORD JFK YVR YYZ MEX'],
+    ['South America', 'SCL GRU EZE'],
+    ['Africa', 'JNB CPT']
+  ].map(([name, codes]) => ({ name, list: codes.split(' ').map(OA.airport) }));
+  const regionOf = c => (GROUPS.find(g => g.list.some(a => a.c === c)) || {}).name || '';
+
+  /* ---------- dropdown: opens on click, filters as you type, arrow keys + Enter ---------- */
+  function combo(prefix) {
+    const root = $(prefix + 'Combo'), input = $(prefix + 'Input'), panel = $(prefix + 'List');
+    const toggle = root.querySelector('.combo-toggle');
+    let items = [], active = -1, filtering = false;
+    const isOpen = () => !panel.hidden;
+
+    function setActive(i, scroll) {
+      items.forEach(el => el.classList.remove('active'));
+      active = i;
+      if (i >= 0 && items[i]) {
+        const el = items[i];
+        el.classList.add('active');
+        input.setAttribute('aria-activedescendant', el.id);
+        if (scroll) {
+          if (i === 0) panel.scrollTop = 0;
+          else if (el.offsetTop < panel.scrollTop) panel.scrollTop = el.offsetTop;
+          else if (el.offsetTop + el.offsetHeight > panel.scrollTop + panel.clientHeight) panel.scrollTop = el.offsetTop + el.offsetHeight - panel.clientHeight;
+        }
+      } else input.removeAttribute('aria-activedescendant');
+    }
+
+    function render() {
+      const q = filtering ? input.value.trim().toLowerCase() : '';
+      const cur = OA.code(input.value);
+      let html = '';
+      GROUPS.forEach(g => {
+        const rows = g.list.filter(a => !q || a.n.toLowerCase().includes(q) || a.c.toLowerCase().includes(q));
+        if (!rows.length) return;
+        html += `<div class="combo-group" role="presentation">${OA.esc(g.name)}</div>`;
+        rows.forEach(a => {
+          html += `<div class="combo-opt${a.c === cur ? ' sel' : ''}" role="option" id="${prefix}-o-${a.c}" data-code="${a.c}" aria-selected="${a.c === cur}"><span>${OA.esc(a.n)}</span><b>${a.c}</b></div>`;
+        });
+      });
+      panel.innerHTML = html || `<div class="combo-empty">No airports match “${OA.esc(input.value)}”.</div>`;
+      items = Array.from(panel.querySelectorAll('.combo-opt'));
+      if (filtering) setActive(items.length ? 0 : -1, true);
+      else setActive(items.findIndex(el => el.classList.contains('sel')), true);
+    }
+
+    function open() { panel.hidden = false; input.setAttribute('aria-expanded', 'true'); root.classList.add('open'); render(); }
+    function close() { panel.hidden = true; input.setAttribute('aria-expanded', 'false'); root.classList.remove('open'); filtering = false; setActive(-1, false); }
+    function settle() { const c = OA.code(input.value); if (c) input.value = OA.label(c); }
+    function choose(code) { input.value = OA.label(code); close(); }
+
+    input.addEventListener('focus', () => { filtering = false; input.select(); open(); });
+    input.addEventListener('click', () => { if (!isOpen()) { filtering = false; open(); } });
+    input.addEventListener('input', () => { filtering = true; if (!isOpen()) open(); else render(); });
+    input.addEventListener('blur', () => { close(); settle(); });
+    input.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); if (!isOpen()) open(); else setActive(Math.min(active + 1, items.length - 1), true); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); if (isOpen()) setActive(Math.max(active - 1, 0), true); }
+      else if (e.key === 'Enter' && isOpen()) {
+        if (active >= 0 && items[active]) { e.preventDefault(); choose(items[active].dataset.code); }
+        else { settle(); close(); }
+      }
+      else if (e.key === 'Escape' && isOpen()) { e.preventDefault(); close(); settle(); }
+      else if (e.key === 'Tab') { close(); settle(); }
+    });
+    // mousedown (not click) so the input keeps focus and doesn't blur first
+    panel.addEventListener('mousedown', e => {
+      e.preventDefault();
+      const opt = e.target.closest('.combo-opt');
+      if (opt) choose(opt.dataset.code);
+    });
+    toggle.addEventListener('mousedown', e => e.preventDefault());
+    toggle.addEventListener('click', () => {
+      if (isOpen()) close();
+      else { filtering = false; input.focus(); if (!isOpen()) open(); }
+    });
+    document.addEventListener('mousedown', e => { if (isOpen() && !root.contains(e.target)) { close(); settle(); } });
+  }
+  combo('from');
+  combo('to');
+
+  /* ---------- starting values ---------- */
+  $('fromInput').value = OA.label(D.from);
+  $('toInput').value = OA.label(D.to);
+  $('departDate').value = D.depart;
+  $('returnDate').value = D.return;
+  $('departDate').min = OA.today();
+  $('returnDate').min = D.depart;
+
+  /* ---------- round trip / one way ---------- */
+  document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {
+    trip = tab.dataset.trip;
+    document.querySelectorAll('.tab').forEach(t => {
+      const on = t === tab;
+      t.classList.toggle('active', on);
+      t.setAttribute('aria-selected', on);
+    });
+    $('returnField').classList.toggle('off', trip === 'oneway');
+    $('returnDate').disabled = trip === 'oneway';
+  }));
+
+  // Keep the return date on or after the departure date
+  $('departDate').addEventListener('change', () => {
+    const d = $('departDate').value;
+    if (!d) return;
+    $('returnDate').min = d;
+    if (!$('returnDate').value || $('returnDate').value < d) $('returnDate').value = OA.addDays(d, 7);
+  });
+
+  /* ---------- swap, passengers ---------- */
+  $('swapBtn').addEventListener('click', () => {
+    const t = $('fromInput').value;
+    $('fromInput').value = $('toInput').value;
+    $('toInput').value = t;
+    $('swapBtn').classList.add('spun');
+    setTimeout(() => $('swapBtn').classList.remove('spun'), 300);
+  });
+  function paintPax() { $('paxCount').textContent = pax + (pax === 1 ? ' adult' : ' adults'); }
+  $('paxPlus').addEventListener('click', () => { if (pax < 9) pax++; paintPax(); });
+  $('paxMinus').addEventListener('click', () => { if (pax > 1) pax--; paintPax(); });
+
+  /* ---------- search → results page ---------- */
+  $('searchForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const from = OA.code($('fromInput').value), to = OA.code($('toInput').value);
+    const depart = $('departDate').value, ret = $('returnDate').value;
+    const err = m => { $('searchError').textContent = m; $('searchError').classList.add('show'); };
+    if (!from) return err("We don't recognise the departure airport. Pick one from the list.");
+    if (!to) return err("We don't recognise the destination airport. Pick one from the list.");
+    if (from === to) return err('Departure and destination need to be different airports.');
+    if (!depart || depart < OA.today()) return err('Choose a departure date that is today or later.');
+    if (trip === 'round' && (!ret || ret < depart)) return err('Choose a return date on or after your departure date.');
+    $('searchError').classList.remove('show');
+    const p = { from, to, depart, trip, pax: String(pax), cabin: $('cabinSelect').value };
+    if (trip === 'round') p.return = ret;
+    OA.navigate('oceanic-results.html?' + new URLSearchParams(p));
+  });
+
+  /* ---------- popular destinations, priced from the same data the results page uses ---------- */
+  const GRADS = [
+    'linear-gradient(135deg,#163A52,#2A6F86)', 'linear-gradient(135deg,#0D2436,#1E4A66)', 'linear-gradient(135deg,#163A52,#8A6A3A)',
+    'linear-gradient(135deg,#1E4A66,#3E7A5C)', 'linear-gradient(135deg,#0D2436,#3E6A82)', 'linear-gradient(135deg,#1E4A66,#0D2436)'
+  ];
+  let origin = 'BNE';
+  function renderDests() {
+    $('destTitle').textContent = 'Popular from ' + OA.airport(origin).n;
+    document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.origin === origin));
+    $('destGrid').innerHTML = ['NRT', 'SIN', 'LAX', 'AKL', 'DPS', 'LHR'].map((c, i) => {
+      const fl = OA.flights(origin, c, 'Economy', 'round', D.depart);
+      const cheapest = Math.min(...fl.map(f => f.price));
+      const quickest = fl.reduce((a, b) => b.mins < a.mins ? b : a);
+      const direct = fl.some(f => !f.stops);
+      const href = 'oceanic-results.html?' + new URLSearchParams({ from: origin, to: c, depart: D.depart, return: D.return, trip: 'round', pax: '1', cabin: 'Economy' });
+      return `<a class="dest" href="${href}">
+        <div class="dest-top" style="--g:${GRADS[i]}">
+          <span class="reg">${OA.esc(regionOf(c))}</span>
+          <svg viewBox="0 0 260 84" preserveAspectRatio="none" aria-hidden="true"><path d="M14 70 Q130 -6 246 62"/><circle cx="14" cy="70" r="3.5"/></svg>
+          <span class="code">${c}</span>
+        </div>
+        <div class="dest-body">
+          <h3>${OA.esc(OA.airport(c).n)}</h3>
+          <div class="meta">${origin} → ${c} · ${OA.dur(quickest.mins)} fastest · ${direct ? 'Direct available' : 'Via a hub'}</div>
+          <div class="foot"><div class="price">from <strong>${OA.money(cheapest)}</strong> return</div><span class="go">Search →</span></div>
+        </div>
+      </a>`;
+    }).join('');
+  }
+  document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => { origin = c.dataset.origin; renderDests(); }));
+  renderDests();
+
+  /* ---------- promo: pre-select Premium Economy and jump to the search box ---------- */
+  $('promoBtn').addEventListener('click', () => {
+    $('cabinSelect').value = 'Premium Economy';
+    $('searchForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    OA.toast('Cabin set to Premium Economy — pick your route and search.');
+  });
+</script>
+</body>
+</html>
 
