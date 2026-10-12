@@ -1,1 +1,416 @@
-Hello World
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Oceanic Airways | Your World. Within Reach.</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            color: #102a43;
+            background: #f4f8fc;
+        }
+
+        /* NAVIGATION */
+
+        header {
+            background: #ffffff;
+            padding: 20px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: #073b66;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: #00a6c8;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #334e68;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            color: #009dc4;
+        }
+
+        .nav-button {
+            background: #007fa8;
+            color: white !important;
+            padding: 12px 20px;
+            border-radius: 6px;
+        }
+
+        /* HERO SECTION */
+
+        .hero {
+            min-height: 570px;
+            display: flex;
+            align-items: center;
+            padding: 80px 9%;
+            color: white;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(3, 30, 57, 0.88),
+                    rgba(3, 30, 57, 0.35)
+                ),
+                url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=2000&q=85");
+
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero-content {
+            max-width: 650px;
+        }
+
+        .eyebrow {
+            color: #72e0f5;
+            font-size: 13px;
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: clamp(42px, 6vw, 70px);
+            line-height: 1.08;
+            margin-bottom: 22px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #edf7ff;
+            max-width: 520px;
+            margin-bottom: 32px;
+        }
+
+        .primary-button {
+            display: inline-block;
+            background: #00a6c8;
+            color: white;
+            text-decoration: none;
+            padding: 16px 28px;
+            border-radius: 5px;
+            font-size: 15px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .primary-button:hover {
+            background: #0087a6;
+            transform: translateY(-2px);
+        }
+
+        /* INTRODUCTION */
+
+        .intro {
+            text-align: center;
+            padding: 75px 20px 40px;
+        }
+
+        .intro h2 {
+            font-size: 34px;
+            color: #073b66;
+            margin-bottom: 18px;
+        }
+
+        .intro p {
+            max-width: 680px;
+            margin: auto;
+            line-height: 1.8;
+            color: #52677d;
+            font-size: 16px;
+        }
+
+        /* FEATURE CARDS */
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            padding: 35px 7% 80px;
+        }
+
+        .card {
+            background: white;
+            padding: 35px 28px;
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0, 40, 80, 0.06);
+            border-bottom: 4px solid #00a6c8;
+        }
+
+        .card-icon {
+            font-size: 35px;
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            font-size: 21px;
+            color: #073b66;
+            margin-bottom: 13px;
+        }
+
+        .card p {
+            color: #62778b;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        /* BOOKING BANNER */
+
+        .booking-banner {
+            margin: 0 7% 80px;
+            padding: 55px 30px;
+            text-align: center;
+            background: #073b66;
+            color: white;
+            border-radius: 12px;
+        }
+
+        .booking-banner h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .booking-banner p {
+            color: #d8e8f5;
+            margin-bottom: 25px;
+            line-height: 1.7;
+        }
+
+        /* FOOTER */
+
+        footer {
+            background: #041f38;
+            color: #d0deeb;
+            padding: 35px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            font-size: 13px;
+        }
+
+        footer .footer-logo {
+            font-size: 19px;
+            font-weight: bold;
+            color: white;
+        }
+
+        footer .footer-logo span {
+            color: #00c1df;
+        }
+
+        /* MOBILE LAYOUT */
+
+        @media (max-width: 750px) {
+            header {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            nav {
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .hero {
+                min-height: 500px;
+                padding: 60px 7%;
+            }
+
+            .hero h1 {
+                font-size: 43px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                padding-left: 7%;
+                padding-right: 7%;
+            }
+
+            .intro h2,
+            .booking-banner h2 {
+                font-size: 28px;
+            }
+
+            footer {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVIGATION BAR -->
+
+    <header>
+        <div class="logo">OCEANIC<span> AIRWAYS</span></div>
+
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="booking.html">Book Flights</a>
+            <a href="#experience">Our Experience</a>
+            <a href="#about">About Us</a>
+            <a href="booking.html" class="nav-button">Book Now</a>
+        </nav>
+    </header>
+
+
+    <!-- MAIN HERO SECTION -->
+
+    <section class="hero">
+        <div class="hero-content">
+
+            <div class="eyebrow">Welcome aboard Oceanic Airways</div>
+
+            <h1>Your world.<br>Within reach.</h1>
+
+            <p>
+                Discover new horizons with Oceanic Airways.
+                From unforgettable holidays to journeys that bring
+                people together, your next adventure starts here.
+            </p>
+
+            <a href="booking.html" class="primary-button">
+                Book Your Flight &rarr;
+            </a>
+
+        </div>
+    </section>
+
+
+    <!-- INTRODUCTION -->
+
+    <section class="intro" id="about">
+
+        <h2>More than just a flight.</h2>
+
+        <p>
+            At Oceanic Airways, we believe every journey should be
+            something special. Discover a new standard of travel,
+            where comfort, care and the excitement of exploring
+            the world come together.
+        </p>
+
+    </section>
+
+
+    <!-- EXPERIENCE CARDS -->
+
+    <section class="features" id="experience">
+
+        <div class="card">
+
+            <div class="card-icon">🌍</div>
+
+            <h3>Explore the World</h3>
+
+            <p>
+                From vibrant cities to breathtaking coastlines,
+                your next destination is waiting to be discovered.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-icon">✈️</div>
+
+            <h3>Travel in Comfort</h3>
+
+            <p>
+                Settle in, relax and enjoy the journey.
+                We believe getting there should be part of the adventure.
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-icon">💙</div>
+
+            <h3>Every Journey Matters</h3>
+
+            <p>
+                Whether you are travelling for business or pleasure,
+                we want every journey to feel memorable.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- BOOKING CALL TO ACTION -->
+
+    <section class="booking-banner">
+
+        <h2>Where will you go next?</h2>
+
+        <p>
+            Your next adventure is closer than you think.
+            Start planning your journey today.
+        </p>
+
+        <a href="booking.html" class="primary-button">
+            Find Your Flight &rarr;
+        </a>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div class="footer-logo">
+            OCEANIC<span> AIRWAYS</span>
+        </div>
+
+        <p>Your world. Within reach.</p>
+
+        <p>&copy; 2026 Oceanic Airways. All rights reserved.</p>
+
+    </footer>
+
+</body>
+</html>
+```
