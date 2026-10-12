@@ -548,5 +548,34 @@
   });
 </script>
 <a href="booking.html">← Back to Booking</a>
+  <script>
+document.getElementById("searchForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const from = document.getElementById("origin").value;
+    const to = document.getElementById("destination").value;
+    const date = document.getElementById("date").value;
+    const passengers = document.getElementById("passengers").value;
+
+    if (from === to) {
+        alert("Please choose two different airports.");
+        return;
+    }
+
+    if (!date) {
+        alert("Please select a departure date.");
+        return;
+    }
+
+    const params = new URLSearchParams({
+        from: from,
+        to: to,
+        date: date,
+        passengers: passengers
+    });
+
+    window.location.href = "booking.html?" + params.toString();
+});
+</script>
 </body>
 </html>
